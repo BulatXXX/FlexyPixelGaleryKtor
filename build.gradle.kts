@@ -30,10 +30,15 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-apache")
+
     implementation("io.ktor:ktor-serialization-kotlinx-json")
+
+
     implementation("io.ktor:ktor-server-call-logging")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("com.h2database:h2:$h2_version")
     implementation("io.ktor:ktor-server-cors")
     implementation("io.ktor:ktor-server-netty")
@@ -41,4 +46,10 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+
+    implementation("org.postgresql:postgresql:42.5.4")
+
+    implementation("at.favre.lib:bcrypt:0.9.0")
+
 }
