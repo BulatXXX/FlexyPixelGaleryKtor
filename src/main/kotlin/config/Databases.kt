@@ -2,6 +2,7 @@ package com.flexypixelgalleryapi.config
 
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.flexypixelgalleryapi.entities.MobileRole
 import com.flexypixelgalleryapi.entities.User
 import com.flexypixelgalleryapi.entities.UserRole
 import io.ktor.server.application.*
@@ -30,6 +31,7 @@ fun Application.configureDatabases() {
                 it[displayName] = "Admin"
                 it[passwordHash] = hashedPassword
                 it[role] = UserRole.ADMIN
+                it[mobileRole] = MobileRole.DEVELOPER
                 it[isVerified] = true
                 it[createdAt] = LocalDateTime.now()
                 it[updatedAt] = LocalDateTime.now()
