@@ -5,6 +5,7 @@ ktor:
   deployment:
     port: 8080
 jwt:
-  domain: "https://jwt-provider-domain/"
+  domain: "flexypixelapi"
   audience: "jwt-audience"
-  realm: "ktor sample app"
+  realm: "flexypixelapp"
+  secret: "flexypixel2025"

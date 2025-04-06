@@ -8,10 +8,6 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
 
     routing {
-        val userService = UserService()
-        userRoutes(userService)
-        get("/") {
-            call.respondText("Hello World!")
-        }
+        userRoutes()
     }
 }

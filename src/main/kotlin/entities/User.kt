@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 
 
 enum class UserRole { USER, ADMIN }
+enum class MobileRole {USER, DEVELOPER}
 
 object User : Table() {
     val id = integer("id").autoIncrement()
@@ -22,6 +23,7 @@ object User : Table() {
 
     val isVerified = bool("is_verified").default(false)
     val role = enumerationByName("role", 10, UserRole::class).default(UserRole.USER)
+    val mobileRole = enumerationByName("mobile_role", 10, MobileRole::class).default(MobileRole.USER)
     val isBanned = bool("is_banned").default(false)
 
     val lastLoginAt = datetime("last_login_at").nullable()
