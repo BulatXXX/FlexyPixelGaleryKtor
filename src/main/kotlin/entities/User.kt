@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 enum class UserRole { USER, ADMIN }
 enum class MobileRole {USER, DEVELOPER}
 
-object User : Table() {
+object User : Table("users") {
     val id = integer("id").autoIncrement()
     val publicId = uuid("public_id").uniqueIndex()
 

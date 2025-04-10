@@ -4,6 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import com.flexypixelgalleryapi.config.JwtConfig
 import com.flexypixelgalleryapi.models.*
 import com.flexypixelgalleryapi.repositories.UserRepository
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class UserService(private val userRepository: UserRepository) {
@@ -25,6 +26,11 @@ class UserService(private val userRepository: UserRepository) {
         val user = userRepository.findByPublicId(id) ?: return null
         return user
     }
+
+    fun getUserIdByPublicId(publicId: UUID): Int? {
+        return userRepository.getUserIdByPublicId(publicId = publicId)
+    }
+
 
     fun login(request: LoginRequest): LoginResponse {
         val user = userRepository.findByLoginOrEmail(request.loginOrEmail)
