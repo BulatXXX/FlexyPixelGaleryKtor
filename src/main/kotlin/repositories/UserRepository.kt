@@ -22,7 +22,7 @@ interface UserRepository {
     fun exist(email: String, login: String): Boolean
     fun findByPublicId(publicId: UUID): UserResponse?
     fun findByLoginOrEmail(loginOrEmail: String): LoginCredentials?
-
+    fun getUserIdByPublicId(publicId: UUID): Int?
 
 }
 
@@ -95,6 +95,12 @@ class UserRepositoryImpl : UserRepository {
                 .singleOrNull()
         }
     }
+    override fun getUserIdByPublicId(publicId: UUID): Int? = transaction {
+        User.selectAll().where { User.publicId eq publicId }
+            .singleOrNull()
+            ?.get(User.id)
+    }
+
 
 
     private fun generateUsername(displayName: String): String {
@@ -116,4 +122,5 @@ class UserRepositoryImpl : UserRepository {
 
         return username
     }
+
 }
