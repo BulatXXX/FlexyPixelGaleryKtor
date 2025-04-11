@@ -24,6 +24,7 @@ interface UserRepository {
     fun findByLoginOrEmail(loginOrEmail: String): LoginCredentials?
     fun getUserIdByPublicId(publicId: UUID): Int?
 
+
 }
 
 class UserRepositoryImpl : UserRepository {
