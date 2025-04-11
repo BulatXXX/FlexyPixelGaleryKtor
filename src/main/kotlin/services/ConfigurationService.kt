@@ -19,7 +19,10 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         return newPublicId
     }
 
-    // Создание полной конфигурации (с панелями и кадрами)
+    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String): Boolean {
+        return configurationRepository.updateFrameByPublicId(publicId, frameIndex, newFrameJson)
+    }
+
     fun createFullConfiguration(
         ownerId: Int,
         name: String,
@@ -33,6 +36,14 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
             ownerId, newPublicId, name, description, previewImageUrl, panels, frames
         )
         return newPublicId
+    }
+
+    fun updatePanelsAndFrames(
+        publicId: UUID,
+        panels: List<PanelData>,
+        frames: List<FrameData>
+    ): Boolean {
+        return configurationRepository.updatePanelsAndFrames(publicId, panels, frames)
     }
 
     fun updateConfiguration(

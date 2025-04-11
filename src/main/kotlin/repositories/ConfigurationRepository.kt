@@ -4,7 +4,6 @@ import com.flexypixelgalleryapi.entities.Frame
 import com.flexypixelgalleryapi.entities.LEDPanelsConfiguration
 import com.flexypixelgalleryapi.entities.Panel
 import com.flexypixelgalleryapi.models.ConfigurationFullData
-import com.flexypixelgalleryapi.models.configuration.ConfigurationResponse
 import com.flexypixelgalleryapi.models.configuration.FrameData
 import com.flexypixelgalleryapi.models.configuration.PanelData
 import org.jetbrains.exposed.sql.*
@@ -34,9 +33,21 @@ interface ConfigurationRepository {
 
     fun updateConfiguration(publicId: UUID, name: String?, description: String?, previewImageUrl: String?): Boolean
 
+    fun updatePanelsAndFrames(
+        publicId: UUID,
+        panels: List<PanelData>,
+        frames: List<FrameData>
+    ): Boolean
+
     fun deleteConfiguration(publicId: UUID): Boolean
 
     fun getFullConfiguration(publicId: UUID): ConfigurationFullData?
+
+    fun updateFrameByPublicId(
+        publicId: UUID,
+        frameIndex: Int,
+        newFrameJson: String
+    ): Boolean
 }
 
 
@@ -61,6 +72,26 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
+    override fun updateFrameByPublicId(
+        publicId: UUID,
+        frameIndex: Int,
+        newFrameJson: String
+    ): Boolean {
+        return transaction {
+
+            val configRow = LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }
+                .singleOrNull() ?: return@transaction false
+            val configId = configRow[LEDPanelsConfiguration.id]
+
+            val updatedCount = Frame.update({
+                (Frame.configurationId eq configId) and (Frame.index eq frameIndex)
+            }) {
+                it[panelPixelColors] = newFrameJson
+            }
+            updatedCount > 0
+        }
+    }
+
     override fun updateConfiguration(publicId: UUID, name: String?, description: String?, previewImageUrl: String?): Boolean {
         return transaction {
             val updatedCount = LEDPanelsConfiguration.update({ LEDPanelsConfiguration.publicId eq publicId }) {
@@ -73,6 +104,56 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
+    override fun updatePanelsAndFrames(
+        publicId: UUID,
+        panels: List<PanelData>,
+        frames: List<FrameData>
+    ): Boolean {
+        return transaction {
+            val configRow = LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }.singleOrNull()
+                ?: return@transaction false
+
+            val configId = configRow[LEDPanelsConfiguration.id]
+
+            deletePanels(configId)
+            insertPanels(configId, panels)
+
+            deleteFrames(configId)
+            insertFrames(configId, frames)
+
+            true
+        }
+    }
+
+    private fun deletePanels(configId: Int) {
+        Panel.deleteWhere { Panel.configurationId eq configId }
+    }
+
+    private fun insertPanels(configId: Int, panels: List<PanelData>) {
+        panels.forEach { panel ->
+            Panel.insert {
+                it[Panel.configurationId] = configId
+                it[Panel.uid] = panel.uid
+                it[Panel.x] = panel.x
+                it[Panel.y] = panel.y
+                it[Panel.direction] = panel.direction
+            }
+        }
+    }
+
+    private fun deleteFrames(configId: Int) {
+        Frame.deleteWhere { Frame.configurationId eq configId }
+    }
+
+    private fun insertFrames(configId: Int, frames: List<FrameData>) {
+        frames.forEach { frame ->
+            Frame.insert {
+                it[Frame.configurationId] = configId
+                it[Frame.index] = frame.index
+                it[Frame.panelPixelColors] = frame.panelPixelColors
+            }
+        }
+    }
     override fun deleteConfiguration(publicId: UUID): Boolean {
         return transaction {
             LEDPanelsConfiguration.deleteWhere { LEDPanelsConfiguration.publicId eq publicId } > 0
@@ -101,25 +182,9 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
             }.resultedValues?.first()?.get(LEDPanelsConfiguration.id)
                 ?: error("Insert failed")
 
-            // Вставляем панели для данной конфигурации
-            panels.forEach { panel ->
-                Panel.insert {
-                    it[configurationId] = configId
-                    it[uid] = panel.uid
-                    it[x] = panel.x
-                    it[y] = panel.y
-                    it[direction] = panel.direction
-                }
-            }
+            insertPanels(configId, panels)
+            insertFrames(configId, frames)
 
-            // Вставляем каждый кадр для конфигурации
-            frames.forEach { frame ->
-                Frame.insert {
-                    it[configurationId] = configId
-                    it[index] = frame.index
-                    it[panelPixelColors] = frame.panelPixelColors
-                }
-            }
         }
     }
     override fun getFullConfiguration(publicId: UUID): ConfigurationFullData? {
@@ -128,7 +193,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                 .singleOrNull() ?: return@transaction null
 
             val configId = configRow[LEDPanelsConfiguration.id]
-            // Извлекаем панели
+
             val panels = Panel.selectAll().where { Panel.configurationId eq configId }
                 .map { row ->
                     PanelData(
@@ -139,7 +204,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                     )
                 }
 
-            // Извлекаем кадры, упорядоченные по index
+
             val frames = Frame.selectAll().where { Frame.configurationId eq configId }
                 .orderBy(Frame.index to SortOrder.ASC)
                 .map { row ->

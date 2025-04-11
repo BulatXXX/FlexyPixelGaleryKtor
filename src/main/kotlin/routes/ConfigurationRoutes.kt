@@ -3,10 +3,10 @@ package com.flexypixelgalleryapi.routes
 
 import com.flexypixelgalleryapi.models.configuration.ConfigurationRequest
 import com.flexypixelgalleryapi.models.configuration.ConfigurationUpdateRequest
+import com.flexypixelgalleryapi.models.configuration.UpdateConfigurationStructureRequest
 import com.flexypixelgalleryapi.services.ConfigurationService
 import com.flexypixelgalleryapi.services.UserService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
@@ -21,7 +21,25 @@ fun Route.configurationRoutes() {
     authenticate("auth-jwt") {
         route("/configurations") {
 
-            // 1. Создание базовой конфигурации
+            patch("/full/{publicId}/structure") {
+                val publicIdParam = call.parameters["publicId"]
+                    ?: return@patch call.respond(HttpStatusCode.BadRequest, "Missing publicId")
+                val publicId = try {
+                    UUID.fromString(publicIdParam)
+                } catch (e: IllegalArgumentException) {
+                    return@patch call.respond(HttpStatusCode.BadRequest, "Invalid publicId format")
+                }
+
+                val request = call.receive<UpdateConfigurationStructureRequest>()
+
+                val success = configurationService.updatePanelsAndFrames(publicId, request.panels, request.frames)
+                if (success) {
+                    call.respond(HttpStatusCode.OK, "Structure updated successfully")
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Configuration not found")
+                }
+            }
+
             post {
                 val principal = call.principal<JWTPrincipal>()
                     ?: return@post call.respond(HttpStatusCode.Unauthorized, "Unauthorized")
@@ -115,6 +133,37 @@ fun Route.configurationRoutes() {
                     }
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid publicId format")
+                }
+            }
+
+            patch("{publicId}/frames/{frameIndex}") {
+                // Извлекаем publicId из URL
+                val publicIdParam = call.parameters["publicId"]
+                    ?: return@patch call.respond(HttpStatusCode.BadRequest, "Missing publicId")
+                val publicId = try {
+                    UUID.fromString(publicIdParam)
+                } catch (e: IllegalArgumentException) {
+                    return@patch call.respond(HttpStatusCode.BadRequest, "Invalid publicId format")
+                }
+
+                // Извлекаем frameIndex из URL
+                val frameIndexParam = call.parameters["frameIndex"]
+                    ?: return@patch call.respond(HttpStatusCode.BadRequest, "Missing frameIndex")
+                val frameIndex = try {
+                    frameIndexParam.toInt()
+                } catch (e: NumberFormatException) {
+                    return@patch call.respond(HttpStatusCode.BadRequest, "Invalid frameIndex")
+                }
+
+                // Ожидаем тело запроса – новый полный JSON для кадра
+                val newFrameJson = call.receiveText()
+
+                // Вызываем сервис
+                val success = configurationService.updateFrame(publicId, frameIndex, newFrameJson)
+                if (success) {
+                    call.respond(HttpStatusCode.OK, "Frame updated successfully")
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Frame not found")
                 }
             }
         }
