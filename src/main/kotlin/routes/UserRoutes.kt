@@ -15,8 +15,8 @@ import org.koin.ktor.ext.inject
 fun Route.userRoutes() {
 
     val userService: UserService by inject<UserService>()
-    route("/register") {
-        post {
+    route("/users") {
+        post("register") {
             try {
                 val request = call.receive<RegisterRequest>()
                 val response = userService.register(request)
@@ -28,31 +28,32 @@ fun Route.userRoutes() {
                 call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Internal server error"))
             }
         }
-    }
-
-    post("/login") {
-        val request = call.receive<LoginRequest>()
-        try {
-            val response = userService.login(request)
-            call.respond(HttpStatusCode.OK, response)
-        } catch (e: IllegalArgumentException) {
-            call.respond(HttpStatusCode.Unauthorized, mapOf("error" to e.message))
+        post("login") {
+            val request = call.receive<LoginRequest>()
+            try {
+                val response = userService.login(request)
+                call.respond(HttpStatusCode.OK, response)
+            } catch (e: IllegalArgumentException) {
+                call.respond(HttpStatusCode.Unauthorized, mapOf("error" to e.message))
+            }
         }
-    }
 
 
-    authenticate("auth-jwt") {
-        get("/me") {
-            val principal = call.principal<JWTPrincipal>()
-            val pubicId = UUID.fromString(principal!!.payload.getClaim("publicId").asString())
+        authenticate("auth-jwt") {
+            get("me") {
+                val principal = call.principal<JWTPrincipal>()
+                val pubicId = UUID.fromString(principal!!.payload.getClaim("publicId").asString())
 
-            val user = userService.getByPublicId(pubicId)
-            if (user != null) {
-                call.respond(HttpStatusCode.OK, user)
-            } else {
-                call.respond(HttpStatusCode.NotFound, mapOf("error" to "No user found"))
+                val user = userService.getByPublicId(pubicId)
+                if (user != null) {
+                    call.respond(HttpStatusCode.OK, user)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "No user found"))
+                }
             }
         }
     }
+
+
 
 }

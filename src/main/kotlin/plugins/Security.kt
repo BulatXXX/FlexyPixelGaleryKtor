@@ -14,7 +14,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 fun Application.configureSecurity() {
-    // Please read the jwt property from the config file if you are using EngineMain
+
     val jwtAudience = environment.config.property("jwt.audience").getString()
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtRealm = environment.config.property("jwt.realm").getString()
@@ -25,10 +25,7 @@ fun Application.configureSecurity() {
         jwt("auth-jwt") {
             realm = jwtRealm
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(jwtSecret))
-                    .withIssuer(jwtIssuer)
-                    .build()
+                JwtConfig.getVerifier()
             )
             validate { credential ->
                 val publicId =  credential.payload.getClaim("publicId").asString()
@@ -36,6 +33,7 @@ fun Application.configureSecurity() {
             }
         }
     }
+
     authentication {
         oauth("auth-oauth-google") {
             urlProvider = { "http://localhost:8080/callback" }
@@ -53,6 +51,7 @@ fun Application.configureSecurity() {
             client = HttpClient(Apache)
         }
     }
+
     routing {
         authenticate("auth-oauth-google") {
             get("login") {

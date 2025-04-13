@@ -1,6 +1,7 @@
 package com.flexypixelgalleryapi.services
 
 import com.flexypixelgalleryapi.models.ConfigurationFullData
+import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
 import com.flexypixelgalleryapi.models.configuration.FrameData
 import com.flexypixelgalleryapi.models.configuration.PanelData
 import com.flexypixelgalleryapi.repositories.ConfigurationRepository
@@ -12,11 +13,10 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         ownerId: Int,
         name: String,
         description: String,
-        previewImageUrl: String? = null
     ): UUID {
-        val newPublicId = UUID.randomUUID()
-        configurationRepository.createConfiguration(ownerId, newPublicId, name, description, previewImageUrl)
-        return newPublicId
+        val configurationPublicId = UUID.randomUUID()
+        configurationRepository.createConfiguration(ownerId, configurationPublicId, name, description)
+        return configurationPublicId
     }
 
     fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String): Boolean {
@@ -25,15 +25,11 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
 
     fun createFullConfiguration(
         ownerId: Int,
-        name: String,
-        description: String,
-        previewImageUrl: String? = null,
-        panels: List<PanelData>,
-        frames: List<FrameData>
+        requestData: CreateConfigurationData
     ): UUID {
         val newPublicId = UUID.randomUUID()
         configurationRepository.createFullConfiguration(
-            ownerId, newPublicId, name, description, previewImageUrl, panels, frames
+            ownerId, newPublicId, requestData
         )
         return newPublicId
     }
@@ -50,9 +46,8 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         publicId: UUID,
         name: String?,
         description: String?,
-        previewImageUrl: String?
     ): Boolean {
-        return configurationRepository.updateConfiguration(publicId, name, description, previewImageUrl)
+        return configurationRepository.updateConfiguration(publicId, name, description)
     }
 
     fun deleteConfiguration(publicId: UUID): Boolean {
