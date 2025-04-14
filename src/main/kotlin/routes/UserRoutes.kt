@@ -1,7 +1,7 @@
 package com.flexypixelgalleryapi.routes
 
-import com.flexypixelgalleryapi.models.LoginRequest
-import com.flexypixelgalleryapi.models.RegisterRequest
+import com.flexypixelgalleryapi.models.auth.LoginRequest
+import com.flexypixelgalleryapi.models.auth.RegisterRequest
 import com.flexypixelgalleryapi.services.UserService
 import io.ktor.http.*
 import io.ktor.server.auth.*

@@ -31,6 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-apache")
+    implementation("io.ktor:ktor-server-compression")
 
     implementation("io.ktor:ktor-serialization-kotlinx-json")
 
@@ -50,6 +51,9 @@ dependencies {
 
     implementation("io.insert-koin:koin-ktor:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+
+
+
 
 
 

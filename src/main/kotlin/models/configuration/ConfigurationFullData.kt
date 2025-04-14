@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.models
+package com.flexypixelgalleryapi.models.configuration
 
 import com.flexypixelgalleryapi.models.configuration.FrameData
 import com.flexypixelgalleryapi.models.configuration.PanelData

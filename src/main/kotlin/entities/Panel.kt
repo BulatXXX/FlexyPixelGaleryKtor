@@ -13,6 +13,7 @@ object Panel: Table("panels") {
     val x = integer("x")
     val y = integer("y")
     val direction = varchar("direction", 20)
+    val palette = text("palette").nullable()
 
     override val primaryKey = PrimaryKey(configurationId, uid)
 }

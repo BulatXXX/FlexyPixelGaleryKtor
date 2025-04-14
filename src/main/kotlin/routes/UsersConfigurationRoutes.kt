@@ -2,7 +2,7 @@ package com.flexypixelgalleryapi.routes
 
 
 import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
-import com.flexypixelgalleryapi.models.configuration.ConfigurationUpdateRequest
+import com.flexypixelgalleryapi.models.configuration.UpdateConfigurationDataRequest
 import com.flexypixelgalleryapi.models.configuration.UpdateConfigurationStructureData
 import com.flexypixelgalleryapi.services.ConfigurationService
 import com.flexypixelgalleryapi.services.UserService
@@ -13,8 +13,12 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.ktor.ext.inject
 import java.util.UUID
+import java.util.zip.GZIPInputStream
 
 
 fun ApplicationCall.getOwnerIdByPrincipal(userService: UserService): Int? {
@@ -54,7 +58,7 @@ fun Route.usersConfigurationRoutes() {
                 val configurationPublicId =
                     call.getConfigurationPublicIdFromParams() ?: return@patch call.respond(HttpStatusCode.BadRequest)
                 try {
-                    val updateRequest = call.receive<ConfigurationUpdateRequest>()
+                    val updateRequest = call.receive<UpdateConfigurationDataRequest>()
                     val success = configurationService.updateConfiguration(
                         publicId = configurationPublicId,
                         name = updateRequest.name,
@@ -71,8 +75,9 @@ fun Route.usersConfigurationRoutes() {
             }
 
             post("/create/full") {
+
                 val ownerId = call.getOwnerIdByPrincipal(userService) ?: return@post call.respond(
-                    HttpStatusCode.BadRequest,
+                    HttpStatusCode.Unauthorized,
                     "Bad user public id"
                 )
                 val request = call.receive<CreateConfigurationData>()
@@ -153,3 +158,4 @@ fun Route.usersConfigurationRoutes() {
         }
     }
 }
+

@@ -2,9 +2,9 @@ package com.flexypixelgalleryapi.services
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.flexypixelgalleryapi.config.JwtConfig
-import com.flexypixelgalleryapi.models.*
+import com.flexypixelgalleryapi.models.UserResponse
+import com.flexypixelgalleryapi.models.auth.*
 import com.flexypixelgalleryapi.repositories.UserRepository
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class UserService(private val userRepository: UserRepository) {

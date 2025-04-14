@@ -25,6 +25,7 @@ object User : Table("users") {
     val role = enumerationByName("role", 10, UserRole::class).default(UserRole.USER)
     val mobileRole = enumerationByName("mobile_role", 10, MobileRole::class).default(MobileRole.USER)
     val isBanned = bool("is_banned").default(false)
+    val isDeleted = bool("is_deleted").default(false)
 
     val lastLoginAt = datetime("last_login_at").nullable()
 

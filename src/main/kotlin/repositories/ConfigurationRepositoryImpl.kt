@@ -3,7 +3,7 @@ package com.flexypixelgalleryapi.repositories
 import com.flexypixelgalleryapi.entities.Frame
 import com.flexypixelgalleryapi.entities.LEDPanelsConfiguration
 import com.flexypixelgalleryapi.entities.Panel
-import com.flexypixelgalleryapi.models.ConfigurationFullData
+import com.flexypixelgalleryapi.models.configuration.ConfigurationFullData
 import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
 import com.flexypixelgalleryapi.models.configuration.FrameData
 import com.flexypixelgalleryapi.models.configuration.PanelData

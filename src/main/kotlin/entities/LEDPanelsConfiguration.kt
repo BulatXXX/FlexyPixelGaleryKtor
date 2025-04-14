@@ -21,8 +21,11 @@ object LEDPanelsConfiguration : Table(name="configurations") {
             .references(LEDPanelsConfiguration.id, onDelete = ReferenceOption.SET_NULL).nullable()
 
     val forkStatus = enumerationByName("fork_status", 10, ForkStatus::class).default(ForkStatus.ORIGINAL)
+    val interFrameDelay = integer("inter_frame_delay").default(1000)
     val createdAt = datetime("created_at")
     val updatedAt = datetime("updated_at")
+    val isDeleted = bool("is_deleted").default(false)
+    val isBanned = bool("is_banned").default(false)
 
     override val primaryKey = PrimaryKey(id)
 }

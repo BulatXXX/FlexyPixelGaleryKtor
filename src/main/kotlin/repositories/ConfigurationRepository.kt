@@ -1,9 +1,6 @@
 package com.flexypixelgalleryapi.repositories
 
-import com.flexypixelgalleryapi.models.ConfigurationFullData
-import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
-import com.flexypixelgalleryapi.models.configuration.FrameData
-import com.flexypixelgalleryapi.models.configuration.PanelData
+import com.flexypixelgalleryapi.models.configuration.*
 import java.util.*
 
 

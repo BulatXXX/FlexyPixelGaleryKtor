@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureHTTP()
+    configureCompression()
     configureSerialization()
     configureSecurity()
     configureMonitoring()

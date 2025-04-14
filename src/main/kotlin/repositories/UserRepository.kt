@@ -1,14 +1,9 @@
 package com.flexypixelgalleryapi.repositories
 
-import com.flexypixelgalleryapi.entities.MobileRole
 import com.flexypixelgalleryapi.entities.UserRole
-import com.flexypixelgalleryapi.models.RegisterRequest
-import com.flexypixelgalleryapi.entities.User
-import com.flexypixelgalleryapi.models.LoginCredentials
+import com.flexypixelgalleryapi.models.auth.RegisterRequest
+import com.flexypixelgalleryapi.models.auth.LoginCredentials
 import com.flexypixelgalleryapi.models.UserResponse
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.LocalDateTime
 import java.util.UUID
 
 interface UserRepository {
