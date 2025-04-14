@@ -19,24 +19,32 @@ interface ConfigurationRepository{
         requestData: CreateConfigurationData
     )
 
-    fun updateConfiguration(publicId: UUID, name: String?, description: String?,): Boolean
+    fun updateConfiguration(publicId: UUID, name: String?, description: String?,requesterId: Int): Boolean
 
     fun updatePanelsAndFrames(
         publicId: UUID,
         panels: List<PanelData>,
-        frames: List<FrameData>
+        frames: List<FrameData>,
+        requesterId: Int
     ): Boolean
 
-    fun deleteConfiguration(publicId: UUID): Boolean
+    fun deleteConfiguration(publicId: UUID,requesterId: Int): Boolean
 
-    fun getFullConfiguration(publicId: UUID): ConfigurationFullData?
+    fun getFullConfiguration(publicId: UUID,requesterId: Int): ConfigurationForEditorFullData?
 
     fun updateFrameByPublicId(
         publicId: UUID,
         frameIndex: Int,
-        newFrameJson: String
+        newFrameJson: String,
+        requesterId: Int
     ): Boolean
+
+    fun getConfigurationsByOwner(ownerId: Int): List<ConfigurationSummaryResponse>
+
+
+
 }
+
 
 
 

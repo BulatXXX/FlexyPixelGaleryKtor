@@ -5,6 +5,7 @@ import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
 import com.flexypixelgalleryapi.models.configuration.UpdateConfigurationDataRequest
 import com.flexypixelgalleryapi.models.configuration.UpdateConfigurationStructureData
 import com.flexypixelgalleryapi.services.ConfigurationService
+import com.flexypixelgalleryapi.services.AuthService
 import com.flexypixelgalleryapi.services.UserService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -13,12 +14,8 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.koin.ktor.ext.inject
 import java.util.UUID
-import java.util.zip.GZIPInputStream
 
 
 fun ApplicationCall.getOwnerIdByPrincipal(userService: UserService): Int? {
@@ -57,12 +54,15 @@ fun Route.usersConfigurationRoutes() {
             patch("{publicId}/data") {
                 val configurationPublicId =
                     call.getConfigurationPublicIdFromParams() ?: return@patch call.respond(HttpStatusCode.BadRequest)
+                val requesterId =
+                    call.getOwnerIdByPrincipal(userService) ?: return@patch call.respond(HttpStatusCode.Unauthorized)
                 try {
                     val updateRequest = call.receive<UpdateConfigurationDataRequest>()
                     val success = configurationService.updateConfiguration(
                         publicId = configurationPublicId,
                         name = updateRequest.name,
                         description = updateRequest.description,
+                        requesterId = requesterId
                     )
                     if (success) {
                         call.respond(HttpStatusCode.OK, "Configuration updated")
@@ -94,10 +94,17 @@ fun Route.usersConfigurationRoutes() {
                         HttpStatusCode.BadRequest,
                         "Bad config public id"
                     )
+                val requesterId =
+                    call.getOwnerIdByPrincipal(userService) ?: return@patch call.respond(HttpStatusCode.Unauthorized)
                 val request = call.receive<UpdateConfigurationStructureData>()
 
                 val success =
-                    configurationService.updatePanelsAndFrames(configurationPublicId, request.panels, request.frames)
+                    configurationService.updatePanelsAndFrames(
+                        publicId = configurationPublicId,
+                        panels = request.panels,
+                        frames = request.frames,
+                        requesterId = requesterId
+                    )
                 if (success) {
                     call.respond(HttpStatusCode.OK, "Structure updated successfully")
                 } else {
@@ -109,8 +116,10 @@ fun Route.usersConfigurationRoutes() {
 
                 val configurationPublicId =
                     call.getConfigurationPublicIdFromParams() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                val requesterId =
+                    call.getOwnerIdByPrincipal(userService) ?: return@get call.respond(HttpStatusCode.Unauthorized)
                 try {
-                    val configuration = configurationService.getFullConfiguration(configurationPublicId)
+                    val configuration = configurationService.getFullConfiguration(configurationPublicId, requesterId)
                     if (configuration != null) {
                         call.respond(HttpStatusCode.OK, configuration)
                     } else {
@@ -126,10 +135,12 @@ fun Route.usersConfigurationRoutes() {
             delete("{publicId}") {
                 val configurationPublicId =
                     call.getConfigurationPublicIdFromParams() ?: return@delete call.respond(HttpStatusCode.BadRequest)
+                val requesterId =
+                    call.getOwnerIdByPrincipal(userService) ?: return@delete call.respond(HttpStatusCode.Unauthorized)
                 try {
-                    val success = configurationService.deleteConfiguration(configurationPublicId)
+                    val success = configurationService.deleteConfiguration(configurationPublicId, requesterId)
                     if (success) {
-                        call.respond(HttpStatusCode.OK, "Configuration deleted")
+                        call.respond(HttpStatusCode.NoContent)
                     } else {
                         call.respond(HttpStatusCode.NotFound, "Configuration not found")
                     }
@@ -141,19 +152,29 @@ fun Route.usersConfigurationRoutes() {
             patch("{publicId}/frames/{frameIndex}") {
                 val configurationPublicId =
                     call.getConfigurationPublicIdFromParams() ?: return@patch call.respond(HttpStatusCode.BadRequest)
-
+                val requesterId =
+                    call.getOwnerIdByPrincipal(userService) ?: return@patch call.respond(HttpStatusCode.Unauthorized)
                 val frameIndexParam = call.parameters["frameIndex"]
                     ?: return@patch call.respond(HttpStatusCode.BadRequest, "Missing frameIndex")
                 val frameIndex = frameIndexParam.toInt()
 
                 val updatedFrame = call.receiveText()
 
-                val success = configurationService.updateFrame(configurationPublicId, frameIndex, updatedFrame)
+                val success =
+                    configurationService.updateFrame(configurationPublicId, frameIndex, updatedFrame, requesterId)
                 if (success) {
                     call.respond(HttpStatusCode.OK, "Frame updated successfully")
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Frame not found")
                 }
+            }
+            get("all") {
+                val ownerId = call.getOwnerIdByPrincipal(userService)
+                    ?: return@get call.respond(HttpStatusCode.Unauthorized, "Unauthorized")
+
+                println("ownerId: $ownerId")
+                val configurations = configurationService.getConfigurationSummary(ownerId)
+                call.respond(HttpStatusCode.OK, configurations)
             }
         }
     }

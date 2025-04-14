@@ -16,8 +16,8 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         return configurationPublicId
     }
 
-    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String): Boolean {
-        return configurationRepository.updateFrameByPublicId(publicId, frameIndex, newFrameJson)
+    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String,requesterId: Int): Boolean {
+        return configurationRepository.updateFrameByPublicId(publicId, frameIndex, newFrameJson,requesterId)
     }
 
     fun createFullConfiguration(
@@ -34,24 +34,31 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
     fun updatePanelsAndFrames(
         publicId: UUID,
         panels: List<PanelData>,
-        frames: List<FrameData>
+        frames: List<FrameData>,
+        requesterId: Int
     ): Boolean {
-        return configurationRepository.updatePanelsAndFrames(publicId, panels, frames)
+        return configurationRepository.updatePanelsAndFrames(publicId, panels, frames,requesterId)
     }
 
     fun updateConfiguration(
         publicId: UUID,
         name: String?,
         description: String?,
+        requesterId: Int
     ): Boolean {
-        return configurationRepository.updateConfiguration(publicId, name, description)
+        return configurationRepository.updateConfiguration(publicId, name, description,requesterId)
     }
 
-    fun deleteConfiguration(publicId: UUID): Boolean {
-        return configurationRepository.deleteConfiguration(publicId)
+    fun deleteConfiguration(publicId: UUID,requesterId: Int,): Boolean {
+        return configurationRepository.deleteConfiguration(publicId,requesterId)
     }
 
-    fun getFullConfiguration(publicId: UUID): ConfigurationFullData? {
-        return configurationRepository.getFullConfiguration(publicId)
+    fun getFullConfiguration(publicId: UUID, requesterId: Int): ConfigurationForEditorFullData? {
+        val config = configurationRepository.getFullConfiguration(publicId,requesterId) ?: return null
+        return config
+    }
+    fun getConfigurationSummary(ownerId: Int): List<ConfigurationSummaryResponse> {
+        val summary = configurationRepository.getConfigurationsByOwner(ownerId)
+        return summary
     }
 }

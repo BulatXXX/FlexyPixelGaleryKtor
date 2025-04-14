@@ -1,16 +1,13 @@
 package com.flexypixelgalleryapi.models.configuration
 
-import com.flexypixelgalleryapi.models.configuration.FrameData
-import com.flexypixelgalleryapi.models.configuration.PanelData
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Serializable
-data class ConfigurationFullData(
+data class ConfigurationForEditorFullData(
     @Contextual val publicId: UUID,
-    val ownerId: Int,
     val name: String,
     val description: String,
     val previewImageUrl: String?,

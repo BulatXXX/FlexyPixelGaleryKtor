@@ -1,45 +1,19 @@
 package com.flexypixelgalleryapi.routes
 
-import com.flexypixelgalleryapi.models.auth.LoginRequest
-import com.flexypixelgalleryapi.models.auth.RegisterRequest
 import com.flexypixelgalleryapi.services.UserService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.util.*
 import org.koin.ktor.ext.inject
+import io.ktor.server.response.*
+import java.util.*
+
 
 fun Route.userRoutes() {
-
     val userService: UserService by inject<UserService>()
-    route("/users") {
-        post("register") {
-            try {
-                val request = call.receive<RegisterRequest>()
-                val response = userService.register(request)
-                call.respond(HttpStatusCode.Created, response)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, mapOf("error" to e.message))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Internal server error"))
-            }
-        }
-        post("login") {
-            val request = call.receive<LoginRequest>()
-            try {
-                val response = userService.login(request)
-                call.respond(HttpStatusCode.OK, response)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Unauthorized, mapOf("error" to e.message))
-            }
-        }
-
-
-        authenticate("auth-jwt") {
+    authenticate("auth-jwt") {
+        route("/users") {
             get("me") {
                 val principal = call.principal<JWTPrincipal>()
                 val pubicId = UUID.fromString(principal!!.payload.getClaim("publicId").asString())
@@ -53,7 +27,4 @@ fun Route.userRoutes() {
             }
         }
     }
-
-
-
 }

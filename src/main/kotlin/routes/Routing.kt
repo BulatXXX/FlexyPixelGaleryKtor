@@ -6,10 +6,11 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
 
     routing {
-        userRoutes()
+        authRoutes()
         route("/configurations"){
             usersConfigurationRoutes()
         }
+        userRoutes()
 
     }
 }

@@ -1,12 +1,10 @@
 package com.flexypixelgalleryapi.repositories
 
+import com.flexypixelgalleryapi.entities.ForkStatus
 import com.flexypixelgalleryapi.entities.Frame
 import com.flexypixelgalleryapi.entities.LEDPanelsConfiguration
 import com.flexypixelgalleryapi.entities.Panel
-import com.flexypixelgalleryapi.models.configuration.ConfigurationFullData
-import com.flexypixelgalleryapi.models.configuration.CreateConfigurationData
-import com.flexypixelgalleryapi.models.configuration.FrameData
-import com.flexypixelgalleryapi.models.configuration.PanelData
+import com.flexypixelgalleryapi.models.configuration.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -35,12 +33,14 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
     override fun updateFrameByPublicId(
         publicId: UUID,
         frameIndex: Int,
-        newFrameJson: String
+        newFrameJson: String,
+        requesterId: Int
     ): Boolean {
         return transaction {
 
             val configRow = LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }
                 .singleOrNull() ?: return@transaction false
+            if (configRow[LEDPanelsConfiguration.ownerId] != requesterId) return@transaction false
             val configId = configRow[LEDPanelsConfiguration.id]
 
             val updatedCount = Frame.update({
@@ -52,13 +52,24 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
-    override fun updateConfiguration(publicId: UUID, name: String?, description: String?): Boolean {
+    override fun updateConfiguration(
+        publicId: UUID,
+        name: String?,
+        description: String?,
+        requesterId: Int
+    ): Boolean {
         return transaction {
-            val updatedCount = LEDPanelsConfiguration.update({ LEDPanelsConfiguration.publicId eq publicId }) {
-                if (name != null) it[this.name] = name
-                if (description != null) it[this.description] = description
-                it[this.updatedAt] = LocalDateTime.now()
-            }
+            val configRow =
+                LEDPanelsConfiguration.selectAll().where(LEDPanelsConfiguration.publicId eq publicId).singleOrNull()
+                    ?: return@transaction false
+            if (configRow[LEDPanelsConfiguration.ownerId] != requesterId) return@transaction false
+
+            val updatedCount =
+                LEDPanelsConfiguration.update({ LEDPanelsConfiguration.id eq configRow[LEDPanelsConfiguration.id] }) {
+                    if (name != null) it[this.name] = name
+                    if (description != null) it[this.description] = description
+                    it[this.updatedAt] = LocalDateTime.now()
+                }
             updatedCount > 0
         }
     }
@@ -66,13 +77,14 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
     override fun updatePanelsAndFrames(
         publicId: UUID,
         panels: List<PanelData>,
-        frames: List<FrameData>
+        frames: List<FrameData>,
+        requesterId: Int
     ): Boolean {
         return transaction {
             val configRow =
                 LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }.singleOrNull()
                     ?: return@transaction false
-
+            if (configRow[LEDPanelsConfiguration.ownerId] != requesterId) return@transaction false
             val configId = configRow[LEDPanelsConfiguration.id]
 
             deletePanels(configId)
@@ -118,12 +130,12 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
-    override fun deleteConfiguration(publicId: UUID): Boolean {
+    override fun deleteConfiguration(publicId: UUID, requesterId: Int): Boolean {
         return transaction {
             val configRow =
                 LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }.singleOrNull()
                     ?: return@transaction false
-
+            if (configRow[LEDPanelsConfiguration.ownerId] != requesterId) return@transaction false
             val configId = configRow[LEDPanelsConfiguration.id]
             deletePanels(configId)
             deleteFrames(configId)
@@ -153,11 +165,11 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
-    override fun getFullConfiguration(publicId: UUID): ConfigurationFullData? {
+    override fun getFullConfiguration(publicId: UUID, requesterId: Int): ConfigurationForEditorFullData? {
         return transaction {
             val configRow = LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.publicId eq publicId }
                 .singleOrNull() ?: return@transaction null
-
+            if (configRow[LEDPanelsConfiguration.ownerId] != requesterId) return@transaction null
             val configId = configRow[LEDPanelsConfiguration.id]
 
             val panels = Panel.selectAll().where { Panel.configurationId eq configId }
@@ -180,9 +192,8 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                     )
                 }
 
-            ConfigurationFullData(
+            ConfigurationForEditorFullData(
                 publicId = configRow[LEDPanelsConfiguration.publicId],
-                ownerId = configRow[LEDPanelsConfiguration.ownerId],
                 name = configRow[LEDPanelsConfiguration.name],
                 description = configRow[LEDPanelsConfiguration.description],
                 previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
@@ -193,4 +204,53 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
             )
         }
     }
+
+    override fun getConfigurationsByOwner(ownerId: Int): List<ConfigurationSummaryResponse> {
+        return transaction {
+                LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.ownerId eq ownerId }.map {
+                    configRow->
+                    val forkStatus = configRow[LEDPanelsConfiguration.forkStatus]
+                    var forkInfo: ForkInfo? = null
+                    if (forkStatus != ForkStatus.ORIGINAL) {
+                        val sourceConfigId = configRow[LEDPanelsConfiguration.sourceConfigurationId]
+                        if (sourceConfigId != null) {
+                            val origRow =
+                                LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.id eq sourceConfigId }
+                                    .singleOrNull()
+                            if (origRow != null) {
+                                val sourceConfigurationPublicId = origRow[LEDPanelsConfiguration.publicId]
+
+                                //TODO getUserShortInfoById(ownerId: Int): AuthorInfo?
+                                val dummyAuthor = AuthorInfo(
+                                    publicId = UUID.randomUUID(),
+                                    username = "dummyUser",
+                                    displayName = "Dummy User",
+                                    avatarUrl = null
+                                )
+                                forkInfo = ForkInfo(
+                                    sourceConfigurationPublicId = sourceConfigurationPublicId,
+                                    author = dummyAuthor
+                                )
+                            }
+                        }
+                    }
+
+                    ConfigurationSummaryResponse(
+                        publicId = configRow[LEDPanelsConfiguration.publicId],
+                        name = configRow[LEDPanelsConfiguration.name],
+                        description = configRow[LEDPanelsConfiguration.description],
+                        previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
+                        createdAt = configRow[LEDPanelsConfiguration.createdAt],
+                        updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
+                        forkStatus = forkStatus,
+                        forkInfo = forkInfo
+                    )
+
+                }
+
+
+        }
+    }
+
+
 }

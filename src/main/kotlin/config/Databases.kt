@@ -14,7 +14,7 @@ fun Application.configureDatabases() {
         password = "flexapipass2025"
     )
     transaction {
-        SchemaUtils.drop(User, LEDPanelsConfiguration, LEDPanelsConfigurationMetadata, Tags, ConfigurationTags, Panel, Frame)
+       // SchemaUtils.drop(User, LEDPanelsConfiguration, LEDPanelsConfigurationMetadata, Tags, ConfigurationTags, Panel, Frame)
 
         SchemaUtils.create(
         User,
