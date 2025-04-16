@@ -1,5 +1,6 @@
 package com.flexypixelgalleryapi
 
+import com.flexypixelgalleryapi.app.app.module
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
