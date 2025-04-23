@@ -1,6 +1,6 @@
 package com.flexypixelgalleryapi.routes
 
-import com.flexypixelgalleryapi.configurations.userLibrary.usersConfigurationRoutes
+import configurations.library.usersConfigurationRoutes
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 

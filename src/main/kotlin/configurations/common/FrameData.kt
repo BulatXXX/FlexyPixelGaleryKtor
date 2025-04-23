@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.configurations.userLibrary.models
+package configurations.common
 
 import kotlinx.serialization.Serializable
 

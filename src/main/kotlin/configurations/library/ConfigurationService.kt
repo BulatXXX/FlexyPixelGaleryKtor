@@ -1,11 +1,14 @@
-package com.flexypixelgalleryapi.configurations.userLibrary
+package configurations.library
 
-import com.flexypixelgalleryapi.configurations.userLibrary.models.ConfigurationForEditorFullData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.ConfigurationSummaryResponse
-import com.flexypixelgalleryapi.configurations.userLibrary.models.CreateConfigurationData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.FrameData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.PanelData
-import com.flexypixelgalleryapi.configurations.userLibrary.repositories.ConfigurationRepository
+import configurations.library.models.*
+import configurations.library.models.create_request.CreateConfigurationData
+import configurations.library.models.create_request.CreateResult
+import configurations.library.models.delete_request.DeleteResult
+import configurations.library.models.get_request.GetResult
+import configurations.library.models.update_request.UpdateConfigurationDataRequest
+import configurations.library.models.update_request.UpdateConfigurationStructureRequest
+import configurations.library.models.update_request.UpdateResult
+import configurations.library.repositories.ConfigurationRepository
 import java.util.UUID
 
 class ConfigurationService(private val configurationRepository: ConfigurationRepository) {
@@ -14,53 +17,103 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         ownerId: Int,
         name: String,
         description: String,
-    ): UUID {
-        val configurationPublicId = UUID.randomUUID()
-        configurationRepository.createConfiguration(ownerId, configurationPublicId, name, description)
-        return configurationPublicId
+    ): CreateResult = UUID.randomUUID().let { configurationPublicId ->
+        val result = configurationRepository.createConfiguration(
+            ownerId,
+            configurationPublicId,
+            name,
+            description,
+        )
+        if (result) {
+            CreateResult.Success(configurationPublicId)
+        } else {
+            CreateResult.DatabaseError
+        }
     }
 
-    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String,requesterId: Int): Boolean {
-        return configurationRepository.updateFrameByPublicId(publicId, frameIndex, newFrameJson,requesterId)
+    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String, requesterId: Int): UpdateResult = when {
+        configurationRepository.updateFrame(publicId, frameIndex, newFrameJson, requesterId) ->
+            UpdateResult.Success("Frame $frameIndex updated")
+
+        configurationRepository.exists(publicId) ->
+            UpdateResult.Forbidden
+
+        else -> UpdateResult.NotFound
     }
+
 
     fun createFullConfiguration(
         ownerId: Int,
         requestData: CreateConfigurationData
-    ): UUID {
-        val newPublicId = UUID.randomUUID()
-        configurationRepository.createFullConfiguration(
-            ownerId, newPublicId, requestData
+    ): CreateResult = UUID.randomUUID().let { configurationPublicId ->
+        val result = configurationRepository.createFullConfiguration(
+            ownerId,
+            configurationPublicId,
+            requestData
         )
-        return newPublicId
+        if (result) {
+            CreateResult.Success(configurationPublicId)
+        } else {
+            CreateResult.DatabaseError
+        }
     }
 
-    fun updatePanelsAndFrames(
+    fun updateConfigurationStructure(
         publicId: UUID,
-        panels: List<PanelData>,
-        frames: List<FrameData>,
-        requesterId: Int
-    ): Boolean {
-        return configurationRepository.updatePanelsAndFrames(publicId, panels, frames,requesterId)
+        request: UpdateConfigurationStructureRequest,
+        requesterId: Int,
+    ): UpdateResult = when {
+        configurationRepository.updateConfigurationStructure(publicId, request, requesterId) ->
+            UpdateResult.Success("Configuration structure (panels and frames) updated")
+
+        configurationRepository.exists(publicId) ->
+            UpdateResult.Forbidden
+
+        else ->
+            UpdateResult.NotFound
     }
 
-    fun updateConfiguration(
+    fun updateConfigurationData(
         publicId: UUID,
-        name: String?,
-        description: String?,
+        request: UpdateConfigurationDataRequest,
         requesterId: Int
-    ): Boolean {
-        return configurationRepository.updateConfiguration(publicId, name, description,requesterId)
+    ): UpdateResult = when {
+        configurationRepository.updateConfigurationData(publicId, request, requesterId) ->
+            UpdateResult.Success("Configuration data updated")
+
+        configurationRepository.exists(publicId) ->
+            UpdateResult.Forbidden
+
+        else ->
+            UpdateResult.NotFound
     }
 
-    fun deleteConfiguration(publicId: UUID,requesterId: Int,): Boolean {
-        return configurationRepository.deleteConfiguration(publicId,requesterId)
+
+    fun deleteConfiguration(publicId: UUID, requesterId: Int): DeleteResult = when {
+        configurationRepository.deleteConfiguration(publicId, requesterId) ->
+            DeleteResult.Success("Deleted configuration")
+
+        configurationRepository.exists(publicId) ->
+            DeleteResult.Forbidden
+
+        else ->
+            DeleteResult.NotFound
     }
 
-    fun getFullConfiguration(publicId: UUID, requesterId: Int): ConfigurationForEditorFullData? {
-        val config = configurationRepository.getFullConfiguration(publicId,requesterId) ?: return null
-        return config
+    fun getFullConfiguration(publicId: UUID, requesterId: Int): GetResult {
+        val res = configurationRepository.getFullConfiguration(publicId, requesterId)
+
+        return when {
+            res != null -> GetResult.Success(res)
+
+            configurationRepository.exists(publicId) ->
+                GetResult.Forbidden
+
+            else ->
+                GetResult.NotFound
+        }
     }
+
     fun getConfigurationSummary(ownerId: Int): List<ConfigurationSummaryResponse> {
         val summary = configurationRepository.getConfigurationsByOwner(ownerId)
         return summary

@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.configurations.userLibrary.models
+package configurations.library.models
 
 import com.flexypixelgalleryapi.app.entities.ForkStatus
 import kotlinx.serialization.Contextual
@@ -18,7 +18,7 @@ data class AuthorInfo(
 @Serializable
 data class ForkInfo(
     @Contextual val sourceConfigurationPublicId: UUID,
-    val author: AuthorInfo
+    val author: AuthorInfo? = null,
 )
 
 @Serializable

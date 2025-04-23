@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.app.config
+package app.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

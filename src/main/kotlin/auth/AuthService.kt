@@ -2,8 +2,8 @@ package auth
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import auth.models.*
-import com.flexypixelgalleryapi.app.config.JwtClaims
-import com.flexypixelgalleryapi.app.config.JwtConfig
+import app.config.JwtClaims
+import app.config.JwtConfig
 import com.flexypixelgalleryapi.repositories.UserRepository
 import java.util.*
 

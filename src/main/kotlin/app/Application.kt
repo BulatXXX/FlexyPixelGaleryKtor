@@ -1,5 +1,6 @@
 package com.flexypixelgalleryapi.app.app
 
+import app.plugins.configureSecurity
 import com.flexypixelgalleryapi.app.config.configureDatabases
 import com.flexypixelgalleryapi.plugins.*
 import com.flexypixelgalleryapi.routes.configureRouting

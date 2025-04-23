@@ -1,42 +1,45 @@
-package com.flexypixelgalleryapi.configurations.userLibrary.repositories
+package configurations.library.repositories
 
-import com.flexypixelgalleryapi.configurations.userLibrary.models.ConfigurationForEditorFullData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.ConfigurationSummaryResponse
-import com.flexypixelgalleryapi.configurations.userLibrary.models.CreateConfigurationData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.FrameData
-import com.flexypixelgalleryapi.configurations.userLibrary.models.PanelData
+import configurations.library.models.*
+import configurations.library.models.create_request.CreateConfigurationData
+import configurations.library.models.update_request.UpdateConfigurationDataRequest
+import configurations.library.models.update_request.UpdateConfigurationStructureRequest
 import java.util.*
 
 
+interface ConfigurationRepository {
+    fun exists(publicId: UUID): Boolean
 
-interface ConfigurationRepository{
     fun createConfiguration(
         ownerId: Int,
         publicId: UUID,
         name: String,
         description: String,
-    )
+    ): Boolean
 
     fun createFullConfiguration(
         ownerId: Int,
         publicId: UUID,
         requestData: CreateConfigurationData
-    )
+    ): Boolean
 
-    fun updateConfiguration(publicId: UUID, name: String?, description: String?,requesterId: Int): Boolean
-
-    fun updatePanelsAndFrames(
+    fun updateConfigurationData(
         publicId: UUID,
-        panels: List<PanelData>,
-        frames: List<FrameData>,
+        request: UpdateConfigurationDataRequest,
         requesterId: Int
     ): Boolean
 
-    fun deleteConfiguration(publicId: UUID,requesterId: Int): Boolean
+    fun updateConfigurationStructure(
+        publicId: UUID,
+        request: UpdateConfigurationStructureRequest,
+        requesterId: Int
+    ): Boolean
 
-    fun getFullConfiguration(publicId: UUID,requesterId: Int): ConfigurationForEditorFullData?
+    fun deleteConfiguration(publicId: UUID, requesterId: Int): Boolean
 
-    fun updateFrameByPublicId(
+    fun getFullConfiguration(publicId: UUID, requesterId: Int): ConfigurationFullResponse?
+
+    fun updateFrame(
         publicId: UUID,
         frameIndex: Int,
         newFrameJson: String,
@@ -44,8 +47,6 @@ interface ConfigurationRepository{
     ): Boolean
 
     fun getConfigurationsByOwner(ownerId: Int): List<ConfigurationSummaryResponse>
-
-
 
 }
 

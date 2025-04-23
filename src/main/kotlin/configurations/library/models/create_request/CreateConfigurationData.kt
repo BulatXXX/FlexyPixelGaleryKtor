@@ -1,5 +1,7 @@
-package com.flexypixelgalleryapi.configurations.userLibrary.models
+package configurations.library.models.create_request
 
+import configurations.common.FrameData
+import configurations.common.PanelData
 import kotlinx.serialization.Serializable
 
 @Serializable

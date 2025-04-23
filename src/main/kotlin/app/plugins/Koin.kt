@@ -1,10 +1,10 @@
 package com.flexypixelgalleryapi.plugins
 
-import com.flexypixelgalleryapi.configurations.userLibrary.repositories.ConfigurationRepository
-import com.flexypixelgalleryapi.configurations.userLibrary.repositories.ConfigurationRepositoryImpl
+import configurations.library.repositories.ConfigurationRepository
+import configurations.library.repositories.ConfigurationRepositoryImpl
 import com.flexypixelgalleryapi.repositories.UserRepository
 import com.flexypixelgalleryapi.repositories.UserRepositoryImpl
-import com.flexypixelgalleryapi.configurations.userLibrary.ConfigurationService
+import configurations.library.ConfigurationService
 import auth.AuthService
 import users.UserService
 import io.ktor.server.application.*
