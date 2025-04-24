@@ -1,8 +1,7 @@
-package com.flexypixelgalleryapi.app.entities
+package app.entities
 
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime
-
 
 enum class UserRole { USER, ADMIN }
 enum class MobileRole {USER, DEVELOPER}
@@ -33,4 +32,7 @@ object User : Table("users") {
     val updatedAt = datetime("updated_at")
 
     override val primaryKey = PrimaryKey(id)
+
 }
+
+

@@ -3,6 +3,7 @@ package com.flexypixelgalleryapi.app.config
 import app.entities.ConfigurationTags
 import app.entities.Rating
 import app.entities.Tags
+import app.entities.User
 import com.flexypixelgalleryapi.app.entities.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.*

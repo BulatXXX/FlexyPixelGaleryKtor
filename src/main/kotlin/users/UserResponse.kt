@@ -1,7 +1,7 @@
 package users
 
-import com.flexypixelgalleryapi.app.entities.MobileRole
-import com.flexypixelgalleryapi.app.entities.UserRole
+import app.entities.MobileRole
+import app.entities.UserRole
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime

@@ -1,7 +1,7 @@
 package app.entities
 
 import com.flexypixelgalleryapi.app.entities.LEDPanelsConfiguration
-import com.flexypixelgalleryapi.app.entities.User
+import app.entities.User
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime

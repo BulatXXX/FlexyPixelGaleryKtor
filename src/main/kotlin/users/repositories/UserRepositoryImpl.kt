@@ -1,10 +1,10 @@
 package com.flexypixelgalleryapi.repositories
 
-import com.flexypixelgalleryapi.app.entities.MobileRole
-import com.flexypixelgalleryapi.app.entities.User
-import com.flexypixelgalleryapi.app.entities.UserRole
-import auth.models.LoginCredentials
-import auth.models.RegisterRequest
+import app.entities.MobileRole
+import app.entities.User
+import app.entities.UserRole
+import auth.models.login_request.LoginCredentials
+import auth.models.register_request.RegisterRequest
 import users.UserResponse
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.or

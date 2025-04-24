@@ -1,4 +1,4 @@
-package auth.models
+package auth.models.register_request
 
 import kotlinx.serialization.Serializable
 

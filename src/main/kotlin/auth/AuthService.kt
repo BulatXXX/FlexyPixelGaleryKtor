@@ -1,22 +1,26 @@
 package auth
 
 import at.favre.lib.crypto.bcrypt.BCrypt
-import auth.models.*
 import app.config.JwtClaims
 import app.config.JwtConfig
-import com.flexypixelgalleryapi.repositories.UserRepository
+import auth.models.login_request.LoginRequest
+import auth.models.login_request.LoginResponse
+import auth.models.refresh_request.RefreshResponse
+import auth.models.register_request.RegisterRequest
+import auth.models.register_request.RegisterResponse
 import java.util.*
 
-class AuthService(private val userRepository: UserRepository) {
+class AuthService(private val authRepository: AuthRepository) {
 
     fun register(request: RegisterRequest): RegisterResponse {
-        val exists = userRepository.exist(request.email, request.login)
+
+        val exists = authRepository.exists(request.email, request.login)
         if (exists) throw IllegalArgumentException("User already exists")
 
         val hashed = BCrypt.withDefaults().hashToString(12, request.password.toCharArray())
         val publicId = UUID.randomUUID()
 
-        userRepository.createUser(publicId, request, hashed)
+        authRepository.registerUser(publicId, request, hashed)
 
         return RegisterResponse(publicId)
 
@@ -24,7 +28,7 @@ class AuthService(private val userRepository: UserRepository) {
 
 
     fun login(request: LoginRequest): LoginResponse {
-        val user = userRepository.findByLoginOrEmail(request.loginOrEmail)
+        val user = authRepository.findByLoginOrEmail(request.loginOrEmail)
             ?: throw IllegalArgumentException("User not found")
 
         val isPasswordCorrect = BCrypt.verifyer()

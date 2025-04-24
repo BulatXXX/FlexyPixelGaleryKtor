@@ -1,5 +1,6 @@
 package configurations.library.repositories
 
+import app.entities.User
 import com.flexypixelgalleryapi.app.entities.*
 import configurations.common.FrameData
 import configurations.common.PanelData

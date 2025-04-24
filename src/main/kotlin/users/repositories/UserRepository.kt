@@ -1,8 +1,8 @@
 package com.flexypixelgalleryapi.repositories
 
-import com.flexypixelgalleryapi.app.entities.UserRole
-import auth.models.RegisterRequest
-import auth.models.LoginCredentials
+import app.entities.UserRole
+import auth.models.register_request.RegisterRequest
+import auth.models.login_request.LoginCredentials
 import users.UserResponse
 import java.util.UUID
 

@@ -1,5 +1,7 @@
-package com.flexypixelgalleryapi.plugins
+package app.plugins
 
+import auth.AuthRepository
+import auth.AuthRepositoryImpl
 import configurations.library.repositories.ConfigurationRepository
 import configurations.library.repositories.ConfigurationRepositoryImpl
 import com.flexypixelgalleryapi.repositories.UserRepository
@@ -16,6 +18,7 @@ fun Application.configureDi() {
         modules(
             module {
                 single<UserRepository> {UserRepositoryImpl()}
+                single<AuthRepository>{AuthRepositoryImpl()}
                 single{ AuthService(get()) }
                 single { UserService(get()) }
                 single<ConfigurationRepository> { ConfigurationRepositoryImpl() }
