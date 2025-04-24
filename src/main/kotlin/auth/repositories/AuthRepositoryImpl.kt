@@ -1,4 +1,4 @@
-package auth
+package auth.repositories
 
 import auth.models.login_request.LoginCredentials
 import auth.models.register_request.RegisterRequest
@@ -14,11 +14,11 @@ import java.util.*
 
 class AuthRepositoryImpl : AuthRepository {
 
-    override fun exists(email:String,login:String): Boolean =
+    override fun exists(email:String,login:String): Boolean = transaction {
         User.selectAll().where {
             (User.email eq email) or (User.login eq login)
         }.count() > 0
-
+    }
 
     override fun registerUser(
         publicId: UUID,
@@ -71,7 +71,6 @@ class AuthRepositoryImpl : AuthRepository {
                 suffix++
             }
         }
-
         return username
     }
 

@@ -5,47 +5,49 @@ import app.config.JwtClaims
 import app.config.JwtConfig
 import auth.models.login_request.LoginRequest
 import auth.models.login_request.LoginResponse
+import auth.models.login_request.LoginResult
 import auth.models.refresh_request.RefreshResponse
 import auth.models.register_request.RegisterRequest
-import auth.models.register_request.RegisterResponse
+import auth.models.register_request.RegisterResult
+import auth.repositories.AuthRepository
 import java.util.*
 
 class AuthService(private val authRepository: AuthRepository) {
 
-    fun register(request: RegisterRequest): RegisterResponse {
+    fun register(request: RegisterRequest): RegisterResult = when {
+        authRepository.exists(request.email, request.login) -> RegisterResult.Conflict
+        else -> {
+            val hashed = BCrypt.withDefaults().hashToString(12, request.password.toCharArray())
+            val publicId = UUID.randomUUID()
 
-        val exists = authRepository.exists(request.email, request.login)
-        if (exists) throw IllegalArgumentException("User already exists")
+            val result = authRepository.registerUser(publicId, request, hashed)
+            if (!result) RegisterResult.DatabaseError
 
-        val hashed = BCrypt.withDefaults().hashToString(12, request.password.toCharArray())
-        val publicId = UUID.randomUUID()
-
-        authRepository.registerUser(publicId, request, hashed)
-
-        return RegisterResponse(publicId)
+            RegisterResult.Success(publicId)
+        }
 
     }
 
-
-    fun login(request: LoginRequest): LoginResponse {
+    fun login(request: LoginRequest): LoginResult {
         val user = authRepository.findByLoginOrEmail(request.loginOrEmail)
-            ?: throw IllegalArgumentException("User not found")
+            ?: return LoginResult.NotFound
 
         val isPasswordCorrect = BCrypt.verifyer()
             .verify(request.password.toCharArray(), user.passwordHash)
             .verified
 
-        if (!isPasswordCorrect) throw IllegalArgumentException("Incorrect password")
+        if (!isPasswordCorrect) return LoginResult.IncorrectPassword
 
         val token = JwtConfig.generateAccessToken(user.id, user.publicId)
         val refreshToken = JwtConfig.generateRefreshToken(user.id, user.publicId)
 
-
-        return LoginResponse(
+        val result = LoginResponse(
             accessToken = token,
             refreshToken = refreshToken,
             publicId = user.publicId
         )
+
+        return LoginResult.Success(result)
     }
 
     fun refreshToken(refreshToken: String): RefreshResponse? {
@@ -63,8 +65,5 @@ class AuthService(private val authRepository: AuthRepository) {
         } catch (ex: Exception) {
             null
         }
-
     }
-
-
 }

@@ -1,43 +1,20 @@
-package com.flexypixelgalleryapi.repositories
+package users.repositories
 
-import app.entities.MobileRole
 import app.entities.User
-import app.entities.UserRole
-import auth.models.login_request.LoginCredentials
-import auth.models.register_request.RegisterRequest
-import users.UserResponse
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import users.models.get_request.UserResponse
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import users.models.get_request.PublicUserResponse
+import users.models.update_request.UpdateRequest
 import java.time.LocalDateTime
 import java.util.*
 
 class UserRepositoryImpl : UserRepository {
 
-    override fun createUser(
-        publicId: UUID,
-        request: RegisterRequest,
-        hashedPassword: String,
-        role: UserRole
-    ) {
-        transaction {
-            User.insert {
-                it[User.publicId] = publicId
-                it[User.email] = request.email
-                it[User.login] = request.login
-                it[User.username] = generateUsername(request.displayName)
-                it[User.displayName] = request.displayName
-                it[User.passwordHash] = hashedPassword
-                it[User.phone] = request.phone
-                it[User.role] = role
-                it[User.mobileRole] = MobileRole.USER
-                it[User.isVerified] = false
-                it[User.createdAt] = LocalDateTime.now()
-                it[User.updatedAt] = LocalDateTime.now()
-            }
-        }
-    }
 
     override fun exist(email: String, login: String): Boolean {
         return transaction {
@@ -47,68 +24,59 @@ class UserRepositoryImpl : UserRepository {
         }
     }
 
-    override fun findByLoginOrEmail(loginOrEmail: String): LoginCredentials? {
-        return transaction {
-            User.selectAll().where {
-                (User.email eq loginOrEmail) or (User.login eq loginOrEmail)
-            }.map {
-                LoginCredentials(
-                    id = it[User.id],
-                    publicId = it[User.publicId],
-                    passwordHash = it[User.passwordHash]
-                )
-            }.singleOrNull()
-        }
-    }
 
-
-    override fun findByPublicId(publicId: UUID): UserResponse? {
-        return transaction {
-            User.selectAll().where { User.publicId eq publicId }
-                .map {
-                    UserResponse(
-                        publicId = it[User.publicId],
-                        email = it[User.email],
-                        username = it[User.username],
-                        displayName = it[User.displayName],
-                        phone = it[User.phone],
-                        avatarUrl = it[User.avatarUrl],
-                        bio = it[User.bio],
-                        isVerified = it[User.isVerified],
-                        role = it[User.role],
-                        mobileRole = it[User.mobileRole],
-                        createdAt = it[User.createdAt]
-                    )
-                }
-                .singleOrNull()
-        }
-    }
-    override fun getUserIdByPublicId(publicId: UUID): Int? = transaction {
+    override fun findByPublicId(publicId: UUID): PublicUserResponse? = transaction {
         User.selectAll().where { User.publicId eq publicId }
-            .singleOrNull()
-            ?.get(User.id)
-    }
-
-
-
-    private fun generateUsername(displayName: String): String {
-        val base = displayName
-            .lowercase()
-            .replace(Regex("[^a-z0-9]+"), "_")
-            .trim('_')
-            .take(20)
-
-        var username = base
-        var suffix = 1
-
-        transaction {
-            while (!User.selectAll().where { User.username eq username }.empty()) {
-                username = "$base$suffix"
-                suffix++
+            .singleOrNull()?.let {
+                toPublicUserResponse(it)
             }
-        }
-
-        return username
     }
+
+    private fun toPublicUserResponse(row: ResultRow)=
+        PublicUserResponse(
+            publicId = row[User.publicId],
+            username = row[User.username],
+            displayName = row[User.displayName],
+            avatarUrl = row[User.avatarUrl],
+            bio = row[User.bio],
+            createdAt = row[User.createdAt],
+        )
+
+
+
+    override fun findById(userId: Int): UserResponse? = transaction {
+        User.selectAll().where {
+            User.id eq userId
+        }.singleOrNull()?.let {
+            toUserResponse(it)
+        }
+    }
+
+    override fun updateUser(userId: Int, request: UpdateRequest): Boolean = transaction {
+        User.update({ User.id eq userId }) { user ->
+            request.email?.also { user[email] = it }
+            request.username?.also { user[username] = it }
+            request.displayName?.also { user[displayName] = it }
+            request.phone?.also { user[phone] = it }
+            request.avatarUrl?.also { user[avatarUrl] = it }
+            request.bio?.also { user[bio] = it }
+            user[updatedAt] = LocalDateTime.now()
+        } > 0
+    }
+
+    private fun toUserResponse(row: ResultRow) =
+        UserResponse(
+            publicId = row[User.publicId],
+            email = row[User.email],
+            username = row[User.username],
+            displayName = row[User.displayName],
+            phone = row[User.phone],
+            avatarUrl = row[User.avatarUrl],
+            bio = row[User.bio],
+            isVerified = row[User.isVerified],
+            role = row[User.role],
+            mobileRole = row[User.mobileRole],
+            createdAt = row[User.createdAt]
+        )
 
 }

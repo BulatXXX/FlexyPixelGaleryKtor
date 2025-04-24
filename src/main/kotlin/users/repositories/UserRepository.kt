@@ -1,23 +1,15 @@
-package com.flexypixelgalleryapi.repositories
+package users.repositories
 
-import app.entities.UserRole
-import auth.models.register_request.RegisterRequest
-import auth.models.login_request.LoginCredentials
-import users.UserResponse
+import users.models.get_request.PublicUserResponse
+import users.models.get_request.UserResponse
+import users.models.update_request.UpdateRequest
 import java.util.UUID
 
 interface UserRepository {
-    fun createUser(
-        publicId: UUID,
-        request: RegisterRequest,
-        hashedPassword: String,
-        role: UserRole = UserRole.USER
-    )
     fun exist(email: String, login: String): Boolean
-    fun findByPublicId(publicId: UUID): UserResponse?
-    fun findByLoginOrEmail(loginOrEmail: String): LoginCredentials?
-    fun getUserIdByPublicId(publicId: UUID): Int?
-
+    fun findByPublicId(publicId: UUID): PublicUserResponse?
+    fun findById(userId: Int): UserResponse?
+    fun updateUser(userId: Int, request: UpdateRequest): Boolean
 }
 
 

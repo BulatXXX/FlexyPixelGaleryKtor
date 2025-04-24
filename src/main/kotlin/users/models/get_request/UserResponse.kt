@@ -1,4 +1,4 @@
-package users
+package users.models.get_request
 
 import app.entities.MobileRole
 import app.entities.UserRole
@@ -10,16 +10,16 @@ import java.util.*
 @Serializable
 data class UserResponse(
     @Contextual val publicId: UUID,
-    val email: String,
+    val email: String?,
     val username: String,
     val displayName: String,
 
     val phone : String?,
     val avatarUrl: String?,
     val bio : String?,
-    val isVerified: Boolean,
-    val role: UserRole,
-    val mobileRole: MobileRole,
+    val isVerified: Boolean?,
+    val role: UserRole?,
+    val mobileRole: MobileRole?,
     @Contextual val createdAt: LocalDateTime
 )
 

@@ -19,7 +19,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import java.util.UUID
 
-suspend fun ApplicationCall.getConfigurationPublicIdFromParams(): UUID? {
+suspend fun ApplicationCall.getPublicIdFromParams(): UUID? {
     val publicIdParam = this.parameters["publicId"]
     if (publicIdParam == null) {
         respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing required parameter"))
@@ -89,7 +89,7 @@ fun Route.usersConfigurationRoutes() {
 
             patch("{publicId}/data") {
                 val configurationPublicId =
-                    call.getConfigurationPublicIdFromParams() ?: return@patch
+                    call.getPublicIdFromParams() ?: return@patch
 
                 val requesterId = call.requireUserId() ?: return@patch
 
@@ -105,7 +105,7 @@ fun Route.usersConfigurationRoutes() {
 
             patch("{publicId}") {
                 val configurationPublicId =
-                    call.getConfigurationPublicIdFromParams() ?: return@patch
+                    call.getPublicIdFromParams() ?: return@patch
 
                 val requesterId = call.requireUserId() ?: return@patch
 
@@ -122,7 +122,7 @@ fun Route.usersConfigurationRoutes() {
 
             patch("{publicId}/frames/{frameIndex}") {
                 val configurationPublicId =
-                    call.getConfigurationPublicIdFromParams() ?: return@patch
+                    call.getPublicIdFromParams() ?: return@patch
 
                 val requesterId = call.requireUserId() ?: return@patch
 
@@ -138,7 +138,7 @@ fun Route.usersConfigurationRoutes() {
             }
             get("{publicId}") {
                 val configurationPublicId =
-                    call.getConfigurationPublicIdFromParams() ?: return@get
+                    call.getPublicIdFromParams() ?: return@get
 
                 val requesterId = call.requireUserId() ?: return@get
 
@@ -151,7 +151,7 @@ fun Route.usersConfigurationRoutes() {
 
             delete("{publicId}") {
                 val configurationPublicId =
-                    call.getConfigurationPublicIdFromParams() ?: return@delete
+                    call.getPublicIdFromParams() ?: return@delete
 
                 val requesterId = call.requireUserId() ?: return@delete
 

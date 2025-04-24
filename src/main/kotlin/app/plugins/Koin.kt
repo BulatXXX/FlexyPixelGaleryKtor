@@ -1,11 +1,11 @@
 package app.plugins
 
-import auth.AuthRepository
-import auth.AuthRepositoryImpl
+import auth.repositories.AuthRepository
+import auth.repositories.AuthRepositoryImpl
 import configurations.library.repositories.ConfigurationRepository
 import configurations.library.repositories.ConfigurationRepositoryImpl
-import com.flexypixelgalleryapi.repositories.UserRepository
-import com.flexypixelgalleryapi.repositories.UserRepositoryImpl
+import users.repositories.UserRepository
+import users.repositories.UserRepositoryImpl
 import configurations.library.ConfigurationService
 import auth.AuthService
 import users.UserService
@@ -17,8 +17,8 @@ fun Application.configureDi() {
     install(Koin){
         modules(
             module {
-                single<UserRepository> {UserRepositoryImpl()}
-                single<AuthRepository>{AuthRepositoryImpl()}
+                single<UserRepository> { UserRepositoryImpl() }
+                single<AuthRepository>{ AuthRepositoryImpl() }
                 single{ AuthService(get()) }
                 single { UserService(get()) }
                 single<ConfigurationRepository> { ConfigurationRepositoryImpl() }

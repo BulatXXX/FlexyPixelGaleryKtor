@@ -1,4 +1,4 @@
-package auth
+package auth.repositories
 
 import auth.models.login_request.LoginCredentials
 import auth.models.register_request.RegisterRequest
