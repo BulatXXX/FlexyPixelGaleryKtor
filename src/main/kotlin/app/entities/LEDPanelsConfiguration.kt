@@ -1,14 +1,12 @@
-package com.flexypixelgalleryapi.app.entities
+package app.entities
 
-
-import app.entities.User
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime
 
 enum class ForkStatus { ORIGINAL, ADDED, MODIFIED }
 
-object LEDPanelsConfiguration : Table(name="configurations") {
+object LEDPanelsConfiguration : Table(name = "configurations") {
     val id = integer("id").autoIncrement()
     val publicId = uuid("public_id").uniqueIndex()
     val ownerId = integer("owner_id").references(User.id, onDelete = ReferenceOption.CASCADE)

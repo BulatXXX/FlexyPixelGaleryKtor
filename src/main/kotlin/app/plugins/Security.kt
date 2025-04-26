@@ -1,6 +1,5 @@
 package app.plugins
 
-
 import app.config.JwtConfig
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
@@ -11,7 +10,6 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-
 
 fun Application.configureSecurity() {
 
@@ -31,11 +29,6 @@ fun Application.configureSecurity() {
                 val publicId =  credential.payload.getClaim("publicId").asString()
                 if (publicId != null) JWTPrincipal(credential.payload) else null
             }
-        }
-    }
-    routing {
-        authenticate("auth-jwt") {
-
         }
     }
 

@@ -1,11 +1,9 @@
 package users
 
-import app.config.JwtClaims
-import configurations.library.getPublicIdFromParams
+import app.requireUserId
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
@@ -16,14 +14,6 @@ import users.models.update_request.UpdateResult
 import java.util.*
 
 
-suspend fun ApplicationCall.requireUserId(): Int? {
-    val principal = this.principal<JWTPrincipal>()
-    if (principal == null) {
-        respond(HttpStatusCode.Unauthorized)
-        return null
-    }
-    return principal.payload.getClaim(JwtClaims.USER_ID).asInt()
-}
 
 
 suspend fun ApplicationCall.respondGet(result: GetResult) = when (result) {

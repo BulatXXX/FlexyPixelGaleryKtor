@@ -1,5 +1,6 @@
 package configurations.library.repositories
 
+import configurations.library.models.ConfigurationFullResponse
 import configurations.library.models.*
 import configurations.library.models.create_request.CreateConfigurationData
 import configurations.library.models.update_request.UpdateConfigurationDataRequest
@@ -46,7 +47,7 @@ interface ConfigurationRepository {
         requesterId: Int
     ): Boolean
 
-    fun getConfigurationsByOwner(ownerId: Int): List<ConfigurationSummaryResponse>
+    fun getConfigurationsByOwner(ownerId: Int, offset: Long = 0, size: Int = 20): List<ConfigurationSummaryResponse>
 
 }
 

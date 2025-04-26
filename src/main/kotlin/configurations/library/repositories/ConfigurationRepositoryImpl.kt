@@ -1,9 +1,10 @@
 package configurations.library.repositories
 
-import app.entities.User
-import com.flexypixelgalleryapi.app.entities.*
-import configurations.common.FrameData
-import configurations.common.PanelData
+import app.entities.*
+import configurations.common.models.AuthorInfo
+import configurations.library.models.ConfigurationFullResponse
+import configurations.common.models.FrameData
+import configurations.common.models.PanelData
 import configurations.library.models.*
 import configurations.library.models.create_request.CreateConfigurationData
 import configurations.library.models.update_request.UpdateConfigurationDataRequest
@@ -165,9 +166,16 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
-    override fun getConfigurationsByOwner(ownerId: Int): List<ConfigurationSummaryResponse> {
+    override fun getConfigurationsByOwner(
+        ownerId: Int,
+        offset: Long,
+        size: Int,
+    ): List<ConfigurationSummaryResponse> {
         return transaction {
-            LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.ownerId eq ownerId }.map { configRow ->
+            LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.ownerId eq ownerId }
+                .limit(size)
+                .offset(offset)
+                .map { configRow ->
                 val forkStatus = configRow[LEDPanelsConfiguration.forkStatus]
                 var forkInfo: ForkInfo? = null
                 if (forkStatus != ForkStatus.ORIGINAL) {
@@ -203,17 +211,17 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
     }
 
     private fun getUserShortInfoById(ownerId: Int): AuthorInfo? = transaction {
-        val userRow = User.selectAll().where{
+        val userRow = User.selectAll().where {
             User.id eq ownerId
         }.singleOrNull()
-        if (userRow!=null){
+        if (userRow != null) {
             AuthorInfo(
                 publicId = userRow[User.publicId],
                 username = userRow[User.username],
                 displayName = userRow[User.displayName],
                 avatarUrl = userRow[User.avatarUrl]
             )
-        }else{
+        } else {
             null
         }
     }

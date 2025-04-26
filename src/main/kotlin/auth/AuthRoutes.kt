@@ -1,7 +1,6 @@
 package auth
 
 import auth.models.login_request.LoginRequest
-import auth.models.login_request.LoginResponse
 import auth.models.login_request.LoginResult
 import auth.models.register_request.RegisterRequest
 import auth.models.register_request.RegisterResponse
@@ -50,12 +49,12 @@ fun Route.authRoutes() {
     val authService: AuthService by inject<AuthService>()
     route("/auth") {
 
-        post("register") {
+        post("/register") {
             val request = call.receive<RegisterRequest>()
             val result = authService.register(request)
             call.respondRegister(result)
         }
-        post("login") {
+        post("/login") {
             val request = call.receive<LoginRequest>()
             val result = authService.login(request)
             call.respondLogin(result)

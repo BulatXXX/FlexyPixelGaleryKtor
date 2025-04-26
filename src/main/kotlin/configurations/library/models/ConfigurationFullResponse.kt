@@ -1,7 +1,7 @@
 package configurations.library.models
 
-import configurations.common.FrameData
-import configurations.common.PanelData
+import configurations.common.models.FrameData
+import configurations.common.models.PanelData
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime

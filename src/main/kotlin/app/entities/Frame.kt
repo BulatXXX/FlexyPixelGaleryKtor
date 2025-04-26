@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.app.entities
+package app.entities
 
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table

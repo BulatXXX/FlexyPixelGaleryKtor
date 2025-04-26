@@ -1,19 +1,11 @@
 package configurations.library.models
 
-import com.flexypixelgalleryapi.app.entities.ForkStatus
+import app.entities.ForkStatus
+import configurations.common.models.AuthorInfo
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.util.*
-
-
-@Serializable
-data class AuthorInfo(
-    @Contextual val publicId: UUID,
-    val username: String,
-    val avatarUrl: String? = null,
-    val displayName: String
-)
 
 @Serializable
 data class ForkInfo(

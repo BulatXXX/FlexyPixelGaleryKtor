@@ -1,7 +1,7 @@
-package com.flexypixelgalleryapi.plugins
+package app.plugins
 
-import com.flexypixelgalleryapi.utils.LocalDateTimeSerializer
-import com.flexypixelgalleryapi.utils.UUIDSerializer
+import app.utils.LocalDateTimeSerializer
+import app.utils.UUIDSerializer
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -10,7 +10,6 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -22,7 +21,7 @@ fun Application.configureSerialization() {
                 ignoreUnknownKeys = true
                 prettyPrint = false
                 serializersModule = SerializersModule {
-                    contextual(UUID::class,UUIDSerializer as KSerializer<UUID>)
+                    contextual(UUID::class, UUIDSerializer as KSerializer<UUID>)
                     contextual(LocalDateTime::class, LocalDateTimeSerializer as KSerializer<LocalDateTime>)
                 }
             }

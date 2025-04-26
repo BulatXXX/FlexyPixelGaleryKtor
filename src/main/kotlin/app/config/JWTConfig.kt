@@ -9,7 +9,6 @@ object JwtClaims {
     const val USER_ID = "userId"
 }
 
-
 object JwtConfig {
     private lateinit var secret: String
     private lateinit var issuer: String
@@ -32,7 +31,6 @@ object JwtConfig {
             .withExpiresAt(Date(System.currentTimeMillis() + accessValidityInMs))
             .sign(algorithm)
     }
-
 
     fun generateRefreshToken(userId: Int,publicId: UUID): String {
         return JWT.create()

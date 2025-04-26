@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.utils
+package app.utils
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.*

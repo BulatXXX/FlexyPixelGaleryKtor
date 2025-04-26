@@ -1,4 +1,4 @@
-package configurations.common
+package configurations.common.models
 
 import kotlinx.serialization.Serializable
 

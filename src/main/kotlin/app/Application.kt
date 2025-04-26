@@ -1,10 +1,7 @@
-package com.flexypixelgalleryapi.app.app
+package app
 
-import app.plugins.configureDi
-import app.plugins.configureSecurity
-import com.flexypixelgalleryapi.app.config.configureDatabases
-import com.flexypixelgalleryapi.plugins.*
-import com.flexypixelgalleryapi.routes.configureRouting
+import app.config.configureDatabases
+import app.plugins.*
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {

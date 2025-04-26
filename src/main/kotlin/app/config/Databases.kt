@@ -1,14 +1,9 @@
-package com.flexypixelgalleryapi.app.config
+package app.config
 
-import app.entities.ConfigurationTags
-import app.entities.Rating
-import app.entities.Tags
-import app.entities.User
-import com.flexypixelgalleryapi.app.entities.*
+import app.entities.*
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-
 
 fun Application.configureDatabases() {
     Database.connect(
@@ -18,7 +13,7 @@ fun Application.configureDatabases() {
         password = "flexapipass2025"
     )
     transaction {
-        //SchemaUtils.drop(User, LEDPanelsConfiguration, LEDPanelsConfigurationMetadata, Tags, ConfigurationTags, Panel, Frame)
+        // SchemaUtils.drop(User, LEDPanelsConfiguration, LEDPanelsConfigurationMetadata, Tags, ConfigurationTags, Panel, Frame,Rating)
 
         SchemaUtils.create(
             User,

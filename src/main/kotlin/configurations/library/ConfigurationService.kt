@@ -114,8 +114,8 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         }
     }
 
-    fun getConfigurationSummary(ownerId: Int): List<ConfigurationSummaryResponse> {
-        val summary = configurationRepository.getConfigurationsByOwner(ownerId)
+    fun getConfigurationSummary(ownerId: Int, offset:Long = 0, size: Int = 20): List<ConfigurationSummaryResponse> {
+        val summary = configurationRepository.getConfigurationsByOwner(ownerId, offset, size)
         return summary
     }
 }

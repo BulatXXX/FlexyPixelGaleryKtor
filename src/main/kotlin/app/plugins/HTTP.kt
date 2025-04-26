@@ -1,4 +1,4 @@
-package com.flexypixelgalleryapi.plugins
+package app.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*

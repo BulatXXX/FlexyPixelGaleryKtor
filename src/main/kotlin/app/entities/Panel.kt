@@ -1,10 +1,9 @@
-package com.flexypixelgalleryapi.app.entities
+package app.entities
 
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
-
-object Panel: Table("panels") {
+object Panel : Table("panels") {
     val configurationId = integer("configuration_id")
         .references(LEDPanelsConfiguration.id, onDelete = ReferenceOption.CASCADE)
 

@@ -1,7 +1,6 @@
 package configurations.library
 
-
-import app.config.JwtClaims
+import app.requireUserId
 import configurations.library.models.create_request.CreateConfigurationData
 import configurations.library.models.update_request.UpdateConfigurationDataRequest
 import configurations.library.models.update_request.UpdateConfigurationStructureRequest
@@ -12,7 +11,6 @@ import configurations.library.models.update_request.UpdateResult
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -28,15 +26,6 @@ suspend fun ApplicationCall.getPublicIdFromParams(): UUID? {
     val configId = UUID.fromString(publicIdParam)
 
     return configId
-}
-
-suspend fun ApplicationCall.requireUserId(): Int? {
-    val principal = this.principal<JWTPrincipal>()
-    if (principal == null) {
-        respond(HttpStatusCode.Unauthorized)
-        return null
-    }
-    return principal.payload.getClaim(JwtClaims.USER_ID).asInt()
 }
 
 suspend fun ApplicationCall.respondCreate(result: CreateResult) {
@@ -165,7 +154,9 @@ fun Route.usersConfigurationRoutes() {
 
             get("all") {
                 val ownerId = call.requireUserId() ?: return@get
-                val configurations = configurationService.getConfigurationSummary(ownerId)
+                val offset = call.request.queryParameters["offset"]?.toLongOrNull() ?: 0
+                val size = call.request.queryParameters["size"]?.toIntOrNull() ?: 20
+                val configurations = configurationService.getConfigurationSummary(ownerId,offset, size)
                 call.respond(HttpStatusCode.OK, configurations)
             }
         }
