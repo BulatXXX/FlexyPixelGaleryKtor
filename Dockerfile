@@ -24,7 +24,7 @@ COPY build.gradle.kts settings.gradle.kts gradle.properties ./
 COPY gradle ./gradle
 
 # Ставим только зависимости (будет кэшироваться)
-RUN gradle build -x test --no-daemon || true
+RUN gradle build -x test -x startScripts --no-daemon || true
 
 # Потом копируем остальной код проекта
 COPY . .

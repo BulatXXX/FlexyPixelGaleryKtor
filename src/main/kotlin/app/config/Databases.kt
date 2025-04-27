@@ -5,12 +5,17 @@ import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
+
 fun Application.configureDatabases() {
+    val dbUrl = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://localhost:5432/flexydb"
+    val dbUser = System.getenv("DATABASE_USER") ?: "flexyuser"
+    val dbPassword = System.getenv("DATABASE_PASSWORD") ?: "flexapipass2025"
+
     Database.connect(
-        url = "jdbc:postgresql://localhost:5432/flexydb",
+        url = dbUrl,
         driver = "org.postgresql.Driver",
-        user = "flexyuser",
-        password = "flexapipass2025"
+        user = dbUser,
+        password = dbPassword
     )
     transaction {
         // SchemaUtils.drop(User, LEDPanelsConfiguration, LEDPanelsConfigurationMetadata, Tags, ConfigurationTags, Panel, Frame,Rating)
