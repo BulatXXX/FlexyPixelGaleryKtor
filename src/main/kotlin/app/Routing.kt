@@ -48,7 +48,7 @@ suspend inline fun <T> ApplicationCall.requireParam(
 fun Application.configureRouting() {
     routing {
         get("/hello"){
-            call.respond(HttpStatusCode.OK,"Hello World!")
+            call.respond(HttpStatusCode.OK,"Hello FLEXYPIXEL!")
         }
         staticFiles("/uploads", File("uploads"))
         authRoutes()
