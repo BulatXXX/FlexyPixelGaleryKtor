@@ -10,6 +10,9 @@ interface UserRepository {
     fun findByPublicId(publicId: UUID): PublicUserResponse?
     fun findById(userId: Int): UserResponse?
     fun updateUser(userId: Int, request: UpdateRequest): Boolean
+
+    fun getAvatarUrl(userId: Int): String?
+    fun updateAvatarUrl(userId: Int, avatarUrl: String): Boolean
 }
 
 

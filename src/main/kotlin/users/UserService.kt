@@ -6,9 +6,14 @@ import users.models.get_request.UserResponse
 import users.models.update_request.UpdateRequest
 import users.models.update_request.UpdateResult
 import users.repositories.UserRepository
+import java.io.File
+import java.io.IOException
 import java.util.*
 
-class UserService(private val userRepository: UserRepository) {
+class UserService(private val userRepository: UserRepository,
+                  private val uploadBaseUrl: String,           // например, "http://localhost:8080/uploads/avatars"
+                  private val uploadDir: File
+) {
 
     fun getByPublicId(id: UUID): GetResult {
         val userResponse = userRepository.findByPublicId(id) ?: return GetResult.NotFound
@@ -24,6 +29,38 @@ class UserService(private val userRepository: UserRepository) {
         userRepository.updateUser(userId,request) -> UpdateResult.Success
         userRepository.findById(userId) != null -> UpdateResult.DatabaseError
         else -> UpdateResult.NotFound
+    }
+
+    fun replaceAvatar(userId: Int, originalName: String, bytes: ByteArray): Result<String> {
+        // 1) Проверка расширения
+        val ext = originalName.substringAfterLast('.').lowercase()
+        if (ext !in listOf("jpg","jpeg","png","gif")) {
+            return Result.failure(IllegalArgumentException("Invalid file type"))
+        }
+        // 2) Удаляем старый аватар из FS (если есть)
+        userRepository.getAvatarUrl(userId)
+            ?.substringAfterLast("/uploads/avatars/")
+            ?.let { oldFile ->
+                File(uploadDir, oldFile).takeIf { it.exists() }?.delete()
+            }
+
+        // 3) Сохраняем новый файл
+        uploadDir.mkdirs()
+        val newFileName = "$userId.$ext"
+        val target = File(uploadDir, newFileName)
+        try {
+            target.writeBytes(bytes)
+        } catch(e: IOException) {
+            return Result.failure(e)
+        }
+
+        // 4) Обновляем БД
+        val publicUrl = "$uploadBaseUrl/$newFileName"
+        val updated = userRepository.updateAvatarUrl(userId, publicUrl)
+        if (!updated) {
+            return Result.failure(IllegalStateException("Failed to update database"))
+        }
+        return Result.success(publicUrl)
     }
 
 }

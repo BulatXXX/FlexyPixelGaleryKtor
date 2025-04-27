@@ -15,8 +15,10 @@ import configurations.gallery.repositories.SearchRepository
 import configurations.gallery.repositories.SearchRepositoryImpl
 import users.UserService
 import io.ktor.server.application.*
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
+import java.io.File
 
 fun Application.configureDi() {
     install(Koin) {
@@ -25,7 +27,9 @@ fun Application.configureDi() {
                 single<UserRepository> { UserRepositoryImpl() }
                 single<AuthRepository> { AuthRepositoryImpl() }
                 single { AuthService(get()) }
-                single { UserService(get()) }
+                single { File("uploads/avatars") }
+                single(named("avatarBaseUrl")) { "http://localhost:8080/uploads/avatars" }
+                single { UserService(get(), get(named("avatarBaseUrl")), get()) }
                 single<ConfigurationRepository> { ConfigurationRepositoryImpl() }
                 single { ConfigurationService(get()) }
                 single<GalleryRepository> { GalleryRepositoryImpl() }

@@ -79,4 +79,16 @@ class UserRepositoryImpl : UserRepository {
             createdAt = row[User.createdAt]
         )
 
+    override fun getAvatarUrl(userId: Int): String? = transaction {
+        User.selectAll().where { User.id eq userId }
+            .singleOrNull()
+            ?.get(User.avatarUrl)
+    }
+
+    override fun updateAvatarUrl(userId: Int, avatarUrl: String): Boolean = transaction {
+        User.update({ User.id eq userId }) {
+            it[User.avatarUrl] = avatarUrl
+            it[User.updatedAt] = LocalDateTime.now()
+        } > 0
+    }
 }

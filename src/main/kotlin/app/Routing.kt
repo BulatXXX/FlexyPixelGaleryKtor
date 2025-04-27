@@ -8,9 +8,11 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import users.userRoutes
+import java.io.File
 
 suspend fun ApplicationCall.requireUserId(): Int? {
     val principal = this.principal<JWTPrincipal>()
@@ -45,6 +47,7 @@ suspend inline fun <T> ApplicationCall.requireParam(
 
 fun Application.configureRouting() {
     routing {
+        staticFiles("/uploads", File("uploads"))
         authRoutes()
         route("/configurations"){
             usersConfigurationRoutes()

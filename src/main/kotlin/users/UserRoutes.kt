@@ -2,8 +2,10 @@ package users
 
 import app.requireUserId
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
@@ -11,9 +13,8 @@ import io.ktor.server.response.*
 import users.models.get_request.GetResult
 import users.models.update_request.UpdateRequest
 import users.models.update_request.UpdateResult
+import java.io.File
 import java.util.*
-
-
 
 
 suspend fun ApplicationCall.respondGet(result: GetResult) = when (result) {
@@ -47,6 +48,41 @@ fun Route.userRoutes() {
                     val result = userService.updateUserInfo(userId, request)
                     call.respondUpdate(result)
                 }
+                patch("/avatar") {
+                    val userId = call.requireUserId() ?: return@patch
+
+                    // 1. Принимаем файл
+                    val multipart = call.receiveMultipart()
+                    var fileName: String? = null
+                    var fileBytes: ByteArray? = null
+
+                    multipart.forEachPart { part ->
+                        if (part is PartData.FileItem && part.name == "file") {
+                            fileName = part.originalFileName
+                            fileBytes = part.streamProvider().readBytes()
+                        }
+                        part.dispose()
+                    }
+
+                    // 2. Валидация базовая
+                    if (fileName == null || fileBytes == null) {
+                        call.respond(HttpStatusCode.BadRequest, mapOf("error" to "No file provided"))
+                        return@patch
+                    }
+
+                    // 3. Делегируем всю логику в сервис
+                    val result = userService.replaceAvatar(userId, fileName!!, fileBytes!!)
+                    result.fold(
+                        onSuccess = { newUrl ->
+                            call.respond(HttpStatusCode.OK, mapOf("avatarUrl" to newUrl))
+                        },
+                        onFailure = { err ->
+                            call.respond(HttpStatusCode.BadRequest, mapOf("error" to err.message))
+                        }
+                    )
+
+                }
+
             }
 
             get("{publicId}") {
