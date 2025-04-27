@@ -30,7 +30,8 @@ RUN gradle build -x test --no-daemon || true
 COPY . .
 
 # И теперь уже реально билдим проект
-RUN gradle build -x test --no-daemon
+RUN gradle build -x test -x startScripts --no-daemon
+
 
 # Новый слой для минимального runtime
 FROM eclipse-temurin:17-jre
