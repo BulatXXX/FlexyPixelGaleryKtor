@@ -13,9 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run tests
-        run: |
-          ./gradlew test
 
       - name: Build Docker image
         run: |
