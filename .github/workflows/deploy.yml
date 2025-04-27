@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          ./gradlew test
+
+      - name: Build Docker image
+        run: |
+          docker build -t flexypixel-backend:latest .
+
+      - name: Upload Docker image to VPS and restart container
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /opt/flexypixel/FlexyPixelGaleryKtor
+            docker compose down
+            docker compose up -d --build
