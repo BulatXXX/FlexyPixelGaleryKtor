@@ -36,7 +36,7 @@ version: "3.8"
 
 services:
   backend:
-    image: flexypixel-backend:local
+    image: bulatkonnor228/flexypixel-backend:latest
     container_name: flexypixel-backend
     restart: unless-stopped
     ports:
