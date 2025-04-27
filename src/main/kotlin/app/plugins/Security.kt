@@ -13,10 +13,18 @@ import io.ktor.server.sessions.*
 
 fun Application.configureSecurity() {
 
-    val jwtAudience = environment.config.property("jwt.audience").getString()
-    val jwtIssuer = environment.config.property("jwt.domain").getString()
-    val jwtRealm = environment.config.property("jwt.realm").getString()
-    val jwtSecret = environment.config.property("jwt.secret").getString()
+    val jwtAudience = System.getenv("JWT_AUDIENCE")
+        ?: environment.config.propertyOrNull("jwt.audience")?.getString()
+        ?: "jwt-audience"
+    val jwtIssuer = System.getenv("JWT_DOMAIN")
+        ?: environment.config.propertyOrNull("jwt.domain")?.getString()
+        ?: "flexypixelapi"
+    val jwtRealm = System.getenv("JWT_REALM")
+        ?: environment.config.propertyOrNull("jwt.realm")?.getString()
+        ?: "flexypixelapp"
+    val jwtSecret = System.getenv("JWT_SECRET")
+        ?: environment.config.propertyOrNull("jwt.secret")?.getString()
+        ?: "flexypixel2025"
 
     JwtConfig.init(jwtSecret, jwtIssuer)
     authentication {

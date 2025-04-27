@@ -2,15 +2,22 @@ version: "3.8"
 
 services:
   backend:
-    image: bulatkonnor228/flexypixel-backend:latest
+#    image: bulatkonnor228/flexypixel-backend:latest
+    build: .
     container_name: flexypixel-backend
     restart: unless-stopped
     ports:
       - "8080:8080"
+#      - DATABASE_PASSWORD=flexyPixelPassword
     environment:
-      - DATABASE_URL=jdbc:postgresql://localhost:5432/flexydb
+      - DATABASE_URL=jdbc:postgresql://host.docker.internal:5432/flexydb
       - DATABASE_USER=flexyuser
       - DATABASE_PASSWORD=flexyPixelPassword
+      - JWT_DOMAIN=flexypixelapi.fun
+      - JWT_AUDIENCE=jwt-audience
+      - JWT_REALM=flexypixelapp
+      - JWT_SECRET=flexypixel2025
+
     volumes:
       - /var/data/flexypixel/files:/app/files
     networks:
