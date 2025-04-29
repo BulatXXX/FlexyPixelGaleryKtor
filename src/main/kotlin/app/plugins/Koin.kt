@@ -28,7 +28,7 @@ fun Application.configureDi() {
                 single<AuthRepository> { AuthRepositoryImpl() }
                 single { AuthService(get()) }
                 single { File("uploads/avatars") }
-                single(named("avatarBaseUrl")) { "http://localhost:8080/uploads/avatars" }
+                single(named("avatarBaseUrl")) { "http://91.200.13.57:8080/uploads/avatars" }
                 single { UserService(get(), get(named("avatarBaseUrl")), get()) }
                 single<ConfigurationRepository> { ConfigurationRepositoryImpl() }
                 single { ConfigurationService(get()) }
