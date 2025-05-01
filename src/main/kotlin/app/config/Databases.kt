@@ -18,7 +18,7 @@ fun Application.configureDatabases() {
         password = dbPassword
     )
     transaction {
-        SchemaUtils.createMissingTablesAndColumns(
+        SchemaUtils.create(
             User,
             LEDPanelsConfiguration,
             LEDPanelsConfigurationMetadata,
