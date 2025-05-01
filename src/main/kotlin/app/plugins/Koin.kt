@@ -22,8 +22,8 @@ import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import java.io.File
 
-const val apiUrl = "localhost"
-//const val apiUrl = "91.200.13.57"
+//const val apiUrl = "localhost"
+const val apiUrl = "91.200.13.57"
 
 fun Application.configureDi() {
     install(Koin) {
