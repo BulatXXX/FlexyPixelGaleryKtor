@@ -53,7 +53,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - /var/data/flexypixel/files:/app/files
-      - /var/data/flexypixel/uploads/avatars:/app/uploads/avatars
+      - /var/data/flexypixel/uploads/avatars:/app/uploads
       - /var/data/flexypixel/uploads/previews:/app/previews
     networks:
       - flexypixel-net
