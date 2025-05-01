@@ -3,8 +3,17 @@ package app.entities
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime
+import java.util.*
 
 enum class ForkStatus { ORIGINAL, ADDED, MODIFIED }
+
+fun toForkStatus(value: String): ForkStatus = when (value.uppercase(Locale.getDefault())) {
+    "ORIGINAL" -> ForkStatus.ORIGINAL
+    "ADDED" -> ForkStatus.ADDED
+    "MODIFIED" -> ForkStatus.MODIFIED
+    else -> ForkStatus.ADDED
+}
+
 
 object LEDPanelsConfiguration : Table(name = "configurations") {
     val id = integer("id").autoIncrement()

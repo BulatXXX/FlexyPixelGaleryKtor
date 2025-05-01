@@ -1,5 +1,6 @@
 package configurations.library.repositories
 
+import app.entities.ForkStatus
 import configurations.library.models.ConfigurationFullResponse
 import configurations.library.models.*
 import configurations.library.models.create_request.CreateConfigurationData
@@ -47,7 +48,13 @@ interface ConfigurationRepository {
         requesterId: Int
     ): Boolean
 
-    fun getConfigurationsByOwner(ownerId: Int, offset: Long = 0, size: Int = 20): List<ConfigurationSummaryResponse>
+    fun getConfigurationsByOwner(
+        ownerId: Int,
+        offset: Long = 0,
+        size: Int = 20,
+        forkStatus: ForkStatus? = null,
+        isPublic: Boolean? = null,
+    ): List<ConfigurationSummaryResponse>
 
 }
 

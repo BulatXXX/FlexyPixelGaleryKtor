@@ -4,7 +4,6 @@ import app.entities.*
 import configurations.common.models.AuthorInfo
 import configurations.gallery.models.search_request.*
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -62,9 +61,6 @@ class SearchRepositoryImpl : SearchRepository {
         query = query.applyRangeFilter(LEDPanelsConfigurationMetadata.publishedAt, filters.publishedAtRange)
         query = query.applyRangeFilter(LEDPanelsConfigurationMetadata.averageRating, filters.ratingRange)
         query = query.applyRangeFilter(LEDPanelsConfigurationMetadata.addedCount, filters.addedCountRange)
-
-
-
 
 
         query = when (val sort = filters.sortBy) {

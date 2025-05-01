@@ -44,6 +44,19 @@ suspend inline fun <T> ApplicationCall.requireParam(
     return value
 }
 
+inline fun <T> ApplicationCall.optionalParam(
+    name: String,
+    parser: (String) -> T?
+): T? {
+    val raw = request.queryParameters[name] ?: return null
+    return try {
+        parser(raw)
+    } catch (e: Exception) {
+        null
+    }
+}
+
+
 
 fun Application.configureRouting() {
     routing {

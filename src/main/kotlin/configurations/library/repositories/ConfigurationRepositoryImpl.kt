@@ -170,20 +170,34 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         ownerId: Int,
         offset: Long,
         size: Int,
+        forkStatus: ForkStatus?,
+        isPublic: Boolean?
     ): List<ConfigurationSummaryResponse> {
         return transaction {
-            LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.ownerId eq ownerId }
-                .limit(size)
-                .offset(offset)
-                .map { configRow ->
-                val forkStatus = configRow[LEDPanelsConfiguration.forkStatus]
+            val baseQuery = LEDPanelsConfiguration.selectAll().where {
+                LEDPanelsConfiguration.ownerId eq ownerId
+            }
+
+            val filteredQuery = baseQuery.andWhere {
+                Op.build {
+                    listOfNotNull(
+                        forkStatus?.let { LEDPanelsConfiguration.forkStatus eq it },
+                        isPublic?.let { LEDPanelsConfiguration.isPublic eq it }
+                    ).reduceOrNull { acc, expr -> acc and expr } ?: Op.TRUE
+                }
+            }
+
+            filteredQuery.limit(size).offset(offset).map { configRow ->
+                val forkStatusRow = configRow[LEDPanelsConfiguration.forkStatus]
                 var forkInfo: ForkInfo? = null
-                if (forkStatus != ForkStatus.ORIGINAL) {
+
+                if (forkStatusRow != ForkStatus.ORIGINAL) {
                     val sourceConfigId = configRow[LEDPanelsConfiguration.sourceConfigurationId]
                     if (sourceConfigId != null) {
-                        val origRow =
-                            LEDPanelsConfiguration.selectAll().where { LEDPanelsConfiguration.id eq sourceConfigId }
-                                .singleOrNull()
+                        val origRow = LEDPanelsConfiguration.selectAll().where {
+                            LEDPanelsConfiguration.id eq sourceConfigId
+                        }.singleOrNull()
+
                         if (origRow != null) {
                             val sourceConfigurationPublicId = origRow[LEDPanelsConfiguration.publicId]
                             val authorId = origRow[LEDPanelsConfiguration.ownerId]
@@ -203,12 +217,13 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                     previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
                     createdAt = configRow[LEDPanelsConfiguration.createdAt],
                     updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
-                    forkStatus = forkStatus,
+                    forkStatus = forkStatusRow,
                     forkInfo = forkInfo
                 )
             }
         }
     }
+
 
     private fun getUserShortInfoById(ownerId: Int): AuthorInfo? = transaction {
         val userRow = User.selectAll().where {

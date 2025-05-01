@@ -1,5 +1,7 @@
 package configurations.library
 
+import app.entities.toForkStatus
+import app.optionalParam
 import app.requireUserId
 import configurations.library.models.create_request.CreateConfigurationData
 import configurations.library.models.update_request.UpdateConfigurationDataRequest
@@ -133,8 +135,15 @@ fun Route.usersConfigurationRoutes() {
 
                 when (val result = configurationService.getFullConfiguration(configurationPublicId, requesterId)) {
                     is GetResult.Success -> call.respond(HttpStatusCode.OK, result.configurationFullResponse)
-                    is GetResult.Forbidden -> call.respond(HttpStatusCode.Forbidden, mapOf("error" to "User is not the owner"))
-                    is GetResult.NotFound -> call.respond(HttpStatusCode.NotFound, mapOf("error" to "Configuration is not found"))
+                    is GetResult.Forbidden -> call.respond(
+                        HttpStatusCode.Forbidden,
+                        mapOf("error" to "User is not the owner")
+                    )
+
+                    is GetResult.NotFound -> call.respond(
+                        HttpStatusCode.NotFound,
+                        mapOf("error" to "Configuration is not found")
+                    )
                 }
             }
 
@@ -145,10 +154,25 @@ fun Route.usersConfigurationRoutes() {
                 val requesterId = call.requireUserId() ?: return@delete
 
                 when (val result = configurationService.deleteConfiguration(configurationPublicId, requesterId)) {
-                    is DeleteResult.Success -> call.respond(HttpStatusCode.NoContent, mapOf("message" to result.message))
-                    is DeleteResult.Forbidden -> call.respond(HttpStatusCode.Forbidden, mapOf("error" to "User is not the owner"))
-                    is DeleteResult.NotFound -> call.respond(HttpStatusCode.NotFound, mapOf("error" to "Configuration not found"))
-                    is DeleteResult.DatabaseError -> call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Database error"))
+                    is DeleteResult.Success -> call.respond(
+                        HttpStatusCode.NoContent,
+                        mapOf("message" to result.message)
+                    )
+
+                    is DeleteResult.Forbidden -> call.respond(
+                        HttpStatusCode.Forbidden,
+                        mapOf("error" to "User is not the owner")
+                    )
+
+                    is DeleteResult.NotFound -> call.respond(
+                        HttpStatusCode.NotFound,
+                        mapOf("error" to "Configuration not found")
+                    )
+
+                    is DeleteResult.DatabaseError -> call.respond(
+                        HttpStatusCode.BadRequest,
+                        mapOf("error" to "Database error")
+                    )
                 }
             }
 
@@ -156,7 +180,12 @@ fun Route.usersConfigurationRoutes() {
                 val ownerId = call.requireUserId() ?: return@get
                 val offset = call.request.queryParameters["offset"]?.toLongOrNull() ?: 0
                 val size = call.request.queryParameters["size"]?.toIntOrNull() ?: 20
-                val configurations = configurationService.getConfigurationSummary(ownerId,offset, size)
+
+                val forkStatus = call.optionalParam("forkStatus") { toForkStatus(it) }
+                val isPublic = call.optionalParam("isPublic") { it.toBooleanStrictOrNull() }
+
+                val configurations =
+                    configurationService.getConfigurationSummary(ownerId, offset, size, forkStatus, isPublic)
                 call.respond(HttpStatusCode.OK, configurations)
             }
         }
