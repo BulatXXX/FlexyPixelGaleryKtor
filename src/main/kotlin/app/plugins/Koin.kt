@@ -37,13 +37,13 @@ fun Application.configureDi() {
                 single {
                     SvgPreviewGenerator(
                         outputDir = File("previews"),
-                        baseUrl = "http://localhost:8080/previews"
+                        baseUrl = "http://${apiUrl}:8080/previews"
                     )
                 }
                 single {
                     PreviewGenerator(
                         outputDir = File("previews"),
-                        baseUrl = "http://localhost:8080/previews"
+                        baseUrl = "http://${apiUrl}:8080/previews"
                     )
                 }
                 single { UserService(get(), get(named("avatarBaseUrl")), get()) }
