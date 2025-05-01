@@ -64,6 +64,7 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK,"Hello FlexyPixel 1!")
         }
         staticFiles("/uploads", File("uploads"))
+        staticFiles("/previews", File("previews"))
         authRoutes()
         route("/configurations"){
             usersConfigurationRoutes()

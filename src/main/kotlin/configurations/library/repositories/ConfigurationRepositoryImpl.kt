@@ -87,10 +87,12 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
             LEDPanelsConfiguration.update({
                 (LEDPanelsConfiguration.publicId eq publicId) and
                         (LEDPanelsConfiguration.ownerId eq requesterId)
-            }) {
-                it[name] = request.name
-                it[description] = request.description
-                it[updatedAt] = LocalDateTime.now()
+            }) { configRow ->
+                request.name?.let { configRow[LEDPanelsConfiguration.name] = it }
+                request.description?.let { configRow[LEDPanelsConfiguration.description] = it }
+                request.previewUrl?.let { configRow[LEDPanelsConfiguration.previewImageUrl] = it }
+                request.miniPreviewUrl?.let { configRow[LEDPanelsConfiguration.miniPreviewImageUrl] = it }
+                configRow[updatedAt] = LocalDateTime.now()
             }
         updated > 0
     }
@@ -187,7 +189,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                 }
             }
 
-            filteredQuery.limit(size).offset(offset).map { configRow ->
+            filteredQuery.orderBy(LEDPanelsConfiguration.createdAt, SortOrder.DESC).limit(size).offset(offset).map { configRow ->
                 val forkStatusRow = configRow[LEDPanelsConfiguration.forkStatus]
                 var forkInfo: ForkInfo? = null
 
@@ -215,6 +217,9 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                     name = configRow[LEDPanelsConfiguration.name],
                     description = configRow[LEDPanelsConfiguration.description],
                     previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
+                    miniPreviewImageUrl = configRow[LEDPanelsConfiguration.miniPreviewImageUrl],
+                    miniPreviewPanelUid = configRow[LEDPanelsConfiguration.miniPreviewPanelUid],
+                    useMiniPreview = configRow[LEDPanelsConfiguration.useMiniPreview],
                     createdAt = configRow[LEDPanelsConfiguration.createdAt],
                     updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
                     forkStatus = forkStatusRow,

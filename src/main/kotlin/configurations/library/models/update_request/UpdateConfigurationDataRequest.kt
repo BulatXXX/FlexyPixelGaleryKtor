@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdateConfigurationDataRequest(
-    val name: String = "MyConfiguration",
-    val description: String = "Description",
+    val name: String? = null,
+    val description: String? = null,
+    val previewUrl: String? = null,
+    val miniPreviewUrl: String? = null,
 )

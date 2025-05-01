@@ -12,7 +12,10 @@ import configurations.library.models.update_request.UpdateResult
 import configurations.library.repositories.ConfigurationRepository
 import java.util.UUID
 
-class ConfigurationService(private val configurationRepository: ConfigurationRepository) {
+class ConfigurationService(
+    private val configurationRepository: ConfigurationRepository,
+    private val previewGenerator: SvgPreviewGenerator
+) {
 
     fun createConfiguration(
         ownerId: Int,
@@ -32,17 +35,6 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
         }
     }
 
-    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String, requesterId: Int): UpdateResult = when {
-        configurationRepository.updateFrame(publicId, frameIndex, newFrameJson, requesterId) ->
-            UpdateResult.Success("Frame $frameIndex updated")
-
-        configurationRepository.exists(publicId) ->
-            UpdateResult.Forbidden
-
-        else -> UpdateResult.NotFound
-    }
-
-
     fun createFullConfiguration(
         ownerId: Int,
         requestData: CreateConfigurationData
@@ -53,11 +45,32 @@ class ConfigurationService(private val configurationRepository: ConfigurationRep
             requestData
         )
         if (result) {
+            val panels = requestData.panels
+            val firstFrame = requestData.frames.firstOrNull()
+            if (firstFrame != null) {
+                val previewUrl = previewGenerator.generate(panels, firstFrame,configurationPublicId)
+                val miniPreviewUrl = previewGenerator.generate(panels, firstFrame, configurationPublicId,"1")
+                val finalResult = configurationRepository.updateConfigurationData(
+                    configurationPublicId,
+                    UpdateConfigurationDataRequest(previewUrl=previewUrl,miniPreviewUrl=miniPreviewUrl), ownerId
+                )
+            }
             CreateResult.Success(configurationPublicId)
         } else {
             CreateResult.DatabaseError
         }
     }
+
+    fun updateFrame(publicId: UUID, frameIndex: Int, newFrameJson: String, requesterId: Int): UpdateResult = when {
+        configurationRepository.updateFrame(publicId, frameIndex, newFrameJson, requesterId) ->
+            UpdateResult.Success("Frame $frameIndex updated")
+
+        configurationRepository.exists(publicId) ->
+            UpdateResult.Forbidden
+
+        else -> UpdateResult.NotFound
+    }
+
 
     fun updateConfigurationStructure(
         publicId: UUID,

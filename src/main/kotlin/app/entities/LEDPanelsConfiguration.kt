@@ -22,7 +22,13 @@ object LEDPanelsConfiguration : Table(name = "configurations") {
     val name = varchar("name", 255)
     val description = text("description")
     val isPublic = bool("is_public").default(false)
-    val previewImageUrl = varchar("preview_image_url", 512).nullable()
+    
+    val previewImageUrl = varchar("preview_image_url", 512).nullable() // Полное
+    val miniPreviewImageUrl = varchar("mini_preview_image_url", 512).nullable() // Мини
+
+    val miniPreviewPanelUid = varchar("mini_preview_panel_uid", 64).nullable() // UID панели для мини
+    val useMiniPreview = bool("use_mini_preview").default(true) // Использовать мини в карточке
+
 
     val sourceConfigurationId =
         integer("source_configuration_id")
