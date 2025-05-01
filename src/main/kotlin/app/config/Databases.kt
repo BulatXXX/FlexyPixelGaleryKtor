@@ -18,6 +18,16 @@ fun Application.configureDatabases() {
         password = dbPassword
     )
     transaction {
+        SchemaUtils.drop(
+            User,
+            LEDPanelsConfiguration,
+            LEDPanelsConfigurationMetadata,
+            Tags,
+            ConfigurationTags,
+            Panel,
+            Frame,
+            Rating
+        )
         SchemaUtils.create(
             User,
             LEDPanelsConfiguration,
