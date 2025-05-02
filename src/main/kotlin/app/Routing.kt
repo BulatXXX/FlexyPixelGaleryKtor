@@ -60,8 +60,26 @@ inline fun <T> ApplicationCall.optionalParam(
 
 fun Application.configureRouting() {
     routing {
-        get("/hello"){
-            call.respond(HttpStatusCode.OK,"Hello FlexyPixel 0.1.8!")
+        get("/hello") {
+            val version = "0.1.9"
+            val html = """
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8"/>
+        <title>Hello</title>
+        <style>
+          body { background: #f0f0f0; font-family: sans-serif; }
+          h1 { color: teal; text-align: center; margin-top: 2rem; }
+        </style>
+      </head>
+      <body>
+        <h1>Hello FlexyPixel $version!</h1>
+      </body>
+    </html>
+  """.trimIndent()
+
+            call.respondText(html, ContentType.Text.Html, HttpStatusCode.OK)
         }
         staticFiles("/uploads", File("uploads"))
         staticFiles("/previews", File("previews"))
