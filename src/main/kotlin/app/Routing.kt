@@ -61,7 +61,7 @@ inline fun <T> ApplicationCall.optionalParam(
 fun Application.configureRouting() {
     routing {
         get("/hello"){
-            call.respond(HttpStatusCode.OK,"Hello FlexyPixel 0.1.6!")
+            call.respond(HttpStatusCode.OK,"Hello FlexyPixel 0.1.8!")
         }
         staticFiles("/uploads", File("uploads"))
         staticFiles("/previews", File("previews"))
