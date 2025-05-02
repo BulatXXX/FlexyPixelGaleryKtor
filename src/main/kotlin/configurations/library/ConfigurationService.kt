@@ -10,6 +10,7 @@ import configurations.library.models.update_request.UpdateConfigurationDataReque
 import configurations.library.models.update_request.UpdateConfigurationStructureRequest
 import configurations.library.models.update_request.UpdateResult
 import configurations.library.repositories.ConfigurationRepository
+import java.io.File
 import java.util.UUID
 
 class ConfigurationService(
@@ -48,11 +49,11 @@ class ConfigurationService(
             val panels = requestData.panels
             val firstFrame = requestData.frames.firstOrNull()
             if (firstFrame != null) {
-                val previewUrl = previewGenerator.generate(panels, firstFrame,configurationPublicId)
-                val miniPreviewUrl = previewGenerator.generate(panels, firstFrame, configurationPublicId,"1")
+                val previewUrl = previewGenerator.generate(panels, firstFrame, configurationPublicId)
+                val miniPreviewUrl = previewGenerator.generate(panels, firstFrame, configurationPublicId, "1")
                 val finalResult = configurationRepository.updateConfigurationData(
                     configurationPublicId,
-                    UpdateConfigurationDataRequest(previewUrl=previewUrl,miniPreviewUrl=miniPreviewUrl), ownerId
+                    UpdateConfigurationDataRequest(previewUrl = previewUrl, miniPreviewUrl = miniPreviewUrl), ownerId
                 )
             }
             CreateResult.Success(configurationPublicId)
@@ -77,8 +78,32 @@ class ConfigurationService(
         request: UpdateConfigurationStructureRequest,
         requesterId: Int,
     ): UpdateResult = when {
-        configurationRepository.updateConfigurationStructure(publicId, request, requesterId) ->
+        configurationRepository.updateConfigurationStructure(publicId, request, requesterId) -> {
+            val panels = request.panels
+            val firstFrame = request.frames.firstOrNull()
+            firstFrame?.let {
+                val oldMeta = configurationRepository.getConfigInfo(publicId)
+
+                val previewUrl =
+                    previewGenerator.generate(configurationId = publicId, panels = panels, frame = firstFrame)
+                val miniPreviewUrl = previewGenerator.generate(
+                    configurationId = publicId,
+                    panels = panels,
+                    frame = firstFrame,
+                    miniPanelUID = "1"
+                )
+                oldMeta?.previewImageUrl?.let { deletePreviewFile(it) }
+                oldMeta?.miniPreviewImageUrl?.let { deletePreviewFile(it) }
+                configurationRepository.updateConfigurationData(
+                    publicId = publicId, UpdateConfigurationDataRequest(
+                        previewUrl = previewUrl, miniPreviewUrl = miniPreviewUrl,
+                    ), requesterId = requesterId
+                )
+            }
+
             UpdateResult.Success("Configuration structure (panels and frames) updated")
+        }
+
 
         configurationRepository.exists(publicId) ->
             UpdateResult.Forbidden
@@ -137,5 +162,13 @@ class ConfigurationService(
     ): List<ConfigurationSummaryResponse> {
         val summary = configurationRepository.getConfigurationsByOwner(ownerId, offset, size, forkStatus, isPublic)
         return summary
+    }
+
+    private fun deletePreviewFile(url: String) {
+        val fileName = url.substringAfterLast("/")
+        val fullFile = File(previewGenerator.outputDir, fileName)
+        val miniFile = File(previewGenerator.outputDir, fileName) // если у вас разные папки, корректируйте путь
+        if (fullFile.exists()) fullFile.delete()
+        if (miniFile.exists()) miniFile.delete()
     }
 }

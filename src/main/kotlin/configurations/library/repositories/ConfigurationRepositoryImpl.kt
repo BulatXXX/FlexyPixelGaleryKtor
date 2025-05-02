@@ -83,6 +83,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         request: UpdateConfigurationDataRequest,
         requesterId: Int
     ): Boolean = transaction {
+
         val updated =
             LEDPanelsConfiguration.update({
                 (LEDPanelsConfiguration.publicId eq publicId) and
@@ -90,7 +91,9 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
             }) { configRow ->
                 request.name?.let { configRow[LEDPanelsConfiguration.name] = it }
                 request.description?.let { configRow[LEDPanelsConfiguration.description] = it }
-                request.previewUrl?.let { configRow[LEDPanelsConfiguration.previewImageUrl] = it }
+                request.previewUrl?.let {
+                    configRow[LEDPanelsConfiguration.previewImageUrl] = it
+                }
                 request.miniPreviewUrl?.let { configRow[LEDPanelsConfiguration.miniPreviewImageUrl] = it }
                 configRow[updatedAt] = LocalDateTime.now()
             }
@@ -168,6 +171,20 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         }
     }
 
+    override fun getConfigInfo(publicId: UUID): ConfigInfoResponse? = transaction {
+        LEDPanelsConfiguration.selectAll().where {
+            LEDPanelsConfiguration.publicId eq publicId
+        }.map { configRow ->
+            ConfigInfoResponse(
+               name = configRow[LEDPanelsConfiguration.name],
+                description = configRow[LEDPanelsConfiguration.description],
+                previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
+                miniPreviewImageUrl = configRow[LEDPanelsConfiguration.miniPreviewImageUrl],
+                forkStatus = configRow[LEDPanelsConfiguration.forkStatus]
+            )
+        }.singleOrNull()
+    }
+
     override fun getConfigurationsByOwner(
         ownerId: Int,
         offset: Long,
@@ -189,43 +206,44 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                 }
             }
 
-            filteredQuery.orderBy(LEDPanelsConfiguration.createdAt, SortOrder.DESC).limit(size).offset(offset).map { configRow ->
-                val forkStatusRow = configRow[LEDPanelsConfiguration.forkStatus]
-                var forkInfo: ForkInfo? = null
+            filteredQuery.orderBy(LEDPanelsConfiguration.createdAt, SortOrder.DESC).limit(size).offset(offset)
+                .map { configRow ->
+                    val forkStatusRow = configRow[LEDPanelsConfiguration.forkStatus]
+                    var forkInfo: ForkInfo? = null
 
-                if (forkStatusRow != ForkStatus.ORIGINAL) {
-                    val sourceConfigId = configRow[LEDPanelsConfiguration.sourceConfigurationId]
-                    if (sourceConfigId != null) {
-                        val origRow = LEDPanelsConfiguration.selectAll().where {
-                            LEDPanelsConfiguration.id eq sourceConfigId
-                        }.singleOrNull()
+                    if (forkStatusRow != ForkStatus.ORIGINAL) {
+                        val sourceConfigId = configRow[LEDPanelsConfiguration.sourceConfigurationId]
+                        if (sourceConfigId != null) {
+                            val origRow = LEDPanelsConfiguration.selectAll().where {
+                                LEDPanelsConfiguration.id eq sourceConfigId
+                            }.singleOrNull()
 
-                        if (origRow != null) {
-                            val sourceConfigurationPublicId = origRow[LEDPanelsConfiguration.publicId]
-                            val authorId = origRow[LEDPanelsConfiguration.ownerId]
-                            val authorInfo = getUserShortInfoById(authorId)
-                            forkInfo = ForkInfo(
-                                sourceConfigurationPublicId = sourceConfigurationPublicId,
-                                author = authorInfo
-                            )
+                            if (origRow != null) {
+                                val sourceConfigurationPublicId = origRow[LEDPanelsConfiguration.publicId]
+                                val authorId = origRow[LEDPanelsConfiguration.ownerId]
+                                val authorInfo = getUserShortInfoById(authorId)
+                                forkInfo = ForkInfo(
+                                    sourceConfigurationPublicId = sourceConfigurationPublicId,
+                                    author = authorInfo
+                                )
+                            }
                         }
                     }
-                }
 
-                ConfigurationSummaryResponse(
-                    publicId = configRow[LEDPanelsConfiguration.publicId],
-                    name = configRow[LEDPanelsConfiguration.name],
-                    description = configRow[LEDPanelsConfiguration.description],
-                    previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
-                    miniPreviewImageUrl = configRow[LEDPanelsConfiguration.miniPreviewImageUrl],
-                    miniPreviewPanelUid = configRow[LEDPanelsConfiguration.miniPreviewPanelUid],
-                    useMiniPreview = configRow[LEDPanelsConfiguration.useMiniPreview],
-                    createdAt = configRow[LEDPanelsConfiguration.createdAt],
-                    updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
-                    forkStatus = forkStatusRow,
-                    forkInfo = forkInfo
-                )
-            }
+                    ConfigurationSummaryResponse(
+                        publicId = configRow[LEDPanelsConfiguration.publicId],
+                        name = configRow[LEDPanelsConfiguration.name],
+                        description = configRow[LEDPanelsConfiguration.description],
+                        previewImageUrl = configRow[LEDPanelsConfiguration.previewImageUrl],
+                        miniPreviewImageUrl = configRow[LEDPanelsConfiguration.miniPreviewImageUrl],
+                        miniPreviewPanelUid = configRow[LEDPanelsConfiguration.miniPreviewPanelUid],
+                        useMiniPreview = configRow[LEDPanelsConfiguration.useMiniPreview],
+                        createdAt = configRow[LEDPanelsConfiguration.createdAt],
+                        updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
+                        forkStatus = forkStatusRow,
+                        forkInfo = forkInfo
+                    )
+                }
         }
     }
 

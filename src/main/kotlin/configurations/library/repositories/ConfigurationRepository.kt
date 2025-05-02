@@ -41,6 +41,8 @@ interface ConfigurationRepository {
 
     fun getFullConfiguration(publicId: UUID, requesterId: Int): ConfigurationFullResponse?
 
+    fun getConfigInfo(publicId: UUID): ConfigInfoResponse?
+
     fun updateFrame(
         publicId: UUID,
         frameIndex: Int,

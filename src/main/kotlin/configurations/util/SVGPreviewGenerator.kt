@@ -7,7 +7,7 @@ import java.io.File
 import java.util.*
 
 class SvgPreviewGenerator(
-    private val outputDir: File,
+    val outputDir: File,
     private val baseUrl: String
 ) {
     /**
