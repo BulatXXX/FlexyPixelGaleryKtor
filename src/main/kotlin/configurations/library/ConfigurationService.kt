@@ -84,6 +84,12 @@ class ConfigurationService(
             firstFrame?.let {
                 val oldMeta = configurationRepository.getConfigInfo(publicId)
 
+                oldMeta?.previewImageUrl?.let {
+                    deletePreviewFile(it)
+                }
+                oldMeta?.miniPreviewImageUrl?.let {
+                    deletePreviewFile(it) }
+
                 val previewUrl =
                     previewGenerator.generate(configurationId = publicId, panels = panels, frame = firstFrame)
                 val miniPreviewUrl = previewGenerator.generate(
@@ -92,13 +98,13 @@ class ConfigurationService(
                     frame = firstFrame,
                     miniPanelUID = "1"
                 )
-                oldMeta?.previewImageUrl?.let { deletePreviewFile(it) }
-                oldMeta?.miniPreviewImageUrl?.let { deletePreviewFile(it) }
-                configurationRepository.updateConfigurationData(
+
+                val res = configurationRepository.updateConfigurationData(
                     publicId = publicId, UpdateConfigurationDataRequest(
                         previewUrl = previewUrl, miniPreviewUrl = miniPreviewUrl,
                     ), requesterId = requesterId
                 )
+
             }
 
             UpdateResult.Success("Configuration structure (panels and frames) updated")
