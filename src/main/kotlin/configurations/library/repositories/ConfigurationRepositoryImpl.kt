@@ -95,6 +95,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                     configRow[LEDPanelsConfiguration.previewImageUrl] = it
                 }
                 request.miniPreviewUrl?.let { configRow[LEDPanelsConfiguration.miniPreviewImageUrl] = it }
+                request.useMiniPreview?.let { configRow[LEDPanelsConfiguration.useMiniPreview] = it }
                 configRow[updatedAt] = LocalDateTime.now()
             }
         updated > 0

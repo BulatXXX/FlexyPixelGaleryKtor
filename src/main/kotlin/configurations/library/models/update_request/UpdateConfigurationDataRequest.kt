@@ -8,4 +8,5 @@ data class UpdateConfigurationDataRequest(
     val description: String? = null,
     val previewUrl: String? = null,
     val miniPreviewUrl: String? = null,
+    val useMiniPreview: Boolean? = null,
 )
