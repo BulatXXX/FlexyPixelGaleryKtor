@@ -1,5 +1,6 @@
 package configurations.library.models
 
+import app.entities.ForkStatus
 import configurations.common.models.FrameData
 import configurations.common.models.PanelData
 import kotlinx.serialization.Contextual
@@ -13,6 +14,10 @@ data class ConfigurationFullResponse(
     val name: String,
     val description: String,
     val previewImageUrl: String?,
+    val miniPreviewImageUrl: String?,
+    val miniPreviewPanelUid: String?,
+    val useMiniPreview: Boolean,
+    val forkStatus: ForkStatus,
     @Contextual val createdAt: LocalDateTime,
     @Contextual val updatedAt: LocalDateTime,
     val panels: List<PanelData>,
