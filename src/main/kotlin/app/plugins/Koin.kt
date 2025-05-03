@@ -51,7 +51,7 @@ fun Application.configureDi() {
                 single { ConfigurationService(get(), get()) }
                 single<GalleryRepository> { GalleryRepositoryImpl() }
                 single<SearchRepository> { SearchRepositoryImpl() }
-                single { GalleryService(get(), get()) }
+                single { GalleryService(get(), get(),get()) }
             }
         )
     }

@@ -76,4 +76,21 @@ class SvgPreviewGenerator(
         return "$baseUrl/$fileName"
     }
 
+    fun duplicate(configId: UUID, newConfigId: UUID): Pair<String, String> {
+        fun copyOne(suffix: String): String {
+            val originalName = "preview-$configId$suffix.svg"
+            val newName = "preview-$newConfigId$suffix.svg"
+            val origFile = File(outputDir, originalName)
+            if (origFile.exists()) {
+                val target = File(outputDir, newName)
+                origFile.copyTo(target, overwrite = true)
+            }
+            return "$baseUrl/$newName"
+        }
+
+        val fullUrl = copyOne("")
+        val miniUrl = copyOne("-mini")
+        return fullUrl to miniUrl
+    }
+
 }

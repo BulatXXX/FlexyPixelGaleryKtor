@@ -63,6 +63,18 @@ class GalleryRepositoryImpl : GalleryRepository {
         return@transaction true
     }
 
+    override fun updatePreviewUrls(
+        publicId: UUID,
+        fullPreviewUrl: String,
+        miniPreviewUrl: String
+    ): Boolean = transaction {
+        LEDPanelsConfiguration.update({ LEDPanelsConfiguration.publicId eq publicId }) {
+            it[previewImageUrl] = fullPreviewUrl
+            it[miniPreviewImageUrl] = miniPreviewUrl
+            it[updatedAt] = LocalDateTime.now()
+        } > 0
+    }
+
     override fun subscribeConfiguration(sourcePublicConfigID: UUID, newConfigId: UUID, requesterId: Int): Boolean = transaction {
         val origRow = LEDPanelsConfiguration.selectAll().where {
             (LEDPanelsConfiguration.publicId eq sourcePublicConfigID) and

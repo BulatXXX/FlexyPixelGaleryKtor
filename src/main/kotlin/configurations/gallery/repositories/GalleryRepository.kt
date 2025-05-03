@@ -18,4 +18,9 @@ interface GalleryRepository {
         newConfigId: UUID,
         requesterId: Int,
     ):Boolean
+    fun updatePreviewUrls(
+        publicId: UUID,
+        fullPreviewUrl: String,
+        miniPreviewUrl: String
+    ): Boolean
 }

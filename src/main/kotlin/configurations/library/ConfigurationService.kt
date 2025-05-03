@@ -72,7 +72,6 @@ class ConfigurationService(
         else -> UpdateResult.NotFound
     }
 
-
     fun updateConfigurationStructure(
         publicId: UUID,
         request: UpdateConfigurationStructureRequest,
@@ -132,7 +131,6 @@ class ConfigurationService(
         else ->
             UpdateResult.NotFound
     }
-
 
     fun deleteConfiguration(publicId: UUID, requesterId: Int): DeleteResult = when {
         configurationRepository.deleteConfiguration(publicId, requesterId) ->

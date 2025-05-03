@@ -8,12 +8,14 @@ import configurations.gallery.models.search_request.SearchFilters
 import configurations.gallery.models.subscribe_request.SubscribeResult
 import configurations.gallery.repositories.GalleryRepository
 import configurations.gallery.repositories.SearchRepository
+import configurations.library.SvgPreviewGenerator
 import java.util.*
 
 
 class GalleryService(
     private val galleryRepository: GalleryRepository,
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val previewGenerator: SvgPreviewGenerator
 ) {
     fun publishConfiguration(request: PublishRequest, requesterId: Int, configId: UUID): PublishResult {
         val configurationData = galleryRepository.getConfigurationPublishingInfo(configId, requesterId)
@@ -21,21 +23,34 @@ class GalleryService(
             else PublishResult.NotFound
         if (configurationData.isPublic) return PublishResult.AlreadyPublished
         val newPublicId = UUID.randomUUID()
-        return if (galleryRepository.publish(configId, newPublicId, request)) PublishResult.Success(
-            PublishResponse(
-                newPublicId
+        val (newFullUrl, newMiniUrl) = previewGenerator.duplicate(configId, newPublicId)
+        return if (galleryRepository.publish(configId, newPublicId, request) && galleryRepository.updatePreviewUrls(
+                publicId = newPublicId,
+                fullPreviewUrl = newFullUrl,
+                miniPreviewUrl = newMiniUrl
             )
-        ) else {
+        )
+
+            PublishResult.Success(
+                PublishResponse(
+                    newPublicId
+                )
+            ) else {
             PublishResult.DatabaseError
         }
     }
 
     fun subscribeConfiguration(requesterId: Int, configId: UUID): SubscribeResult {
         val newPublicId = UUID.randomUUID()
+        val (newFullUrl, newMiniUrl) = previewGenerator.duplicate(configId, newPublicId)
         return if (galleryRepository.subscribeConfiguration(
                 configId,
                 newPublicId,
                 requesterId
+            ) && galleryRepository.updatePreviewUrls(
+                publicId = newPublicId,
+                fullPreviewUrl = newFullUrl,
+                miniPreviewUrl = newMiniUrl
             )
         ) SubscribeResult.Success(newPublicId)
         else {
