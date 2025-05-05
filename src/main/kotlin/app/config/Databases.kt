@@ -26,7 +26,8 @@ fun Application.configureDatabases() {
             ConfigurationTags,
             Panel,
             Frame,
-            Rating
+            Rating,
+            PasswordRecoveryTokens
         )
     }
 }

@@ -46,16 +46,17 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
+    implementation("io.ktor:ktor-client-cio-jvm:3.1.1")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
     implementation("io.insert-koin:koin-ktor:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
 
-
-
-
-
+    implementation("io.ktor:ktor-client-core:3.1.1")       // или ваша версия Ktor
+    implementation("io.ktor:ktor-client-cio:3.1.1")        // <— этот артефакт
+    implementation("io.ktor:ktor-client-content-negotiation:3.1.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.1")
 
     implementation("org.postgresql:postgresql:42.5.4")
 

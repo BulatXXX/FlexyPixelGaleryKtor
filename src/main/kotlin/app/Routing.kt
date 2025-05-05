@@ -11,6 +11,9 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
+import password_recovery.EmailService
+import password_recovery.passwordRecoveryRoutes
 import users.userRoutes
 import java.io.File
 
@@ -89,5 +92,6 @@ fun Application.configureRouting() {
             galleryRoutes()
         }
         userRoutes()
+        passwordRecoveryRoutes()
     }
 }

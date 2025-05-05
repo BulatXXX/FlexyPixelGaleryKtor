@@ -13,6 +13,8 @@ interface UserRepository {
 
     fun getAvatarUrl(userId: Int): String?
     fun updateAvatarUrl(userId: Int, avatarUrl: String): Boolean
+
+    fun getUserId(email: String): Int?
 }
 
 

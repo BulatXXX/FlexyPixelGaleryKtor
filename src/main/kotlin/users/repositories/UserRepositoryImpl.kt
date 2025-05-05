@@ -32,7 +32,7 @@ class UserRepositoryImpl : UserRepository {
             }
     }
 
-    private fun toPublicUserResponse(row: ResultRow)=
+    private fun toPublicUserResponse(row: ResultRow) =
         PublicUserResponse(
             publicId = row[User.publicId],
             username = row[User.username],
@@ -41,7 +41,6 @@ class UserRepositoryImpl : UserRepository {
             bio = row[User.bio],
             createdAt = row[User.createdAt],
         )
-
 
 
     override fun findById(userId: Int): UserResponse? = transaction {
@@ -90,5 +89,12 @@ class UserRepositoryImpl : UserRepository {
             it[User.avatarUrl] = avatarUrl
             it[User.updatedAt] = LocalDateTime.now()
         } > 0
+    }
+
+    override fun getUserId(email: String): Int? = transaction {
+        val row = User.selectAll().where {
+            User.email eq email
+        }.singleOrNull() ?: return@transaction null
+        row[User.id]
     }
 }
