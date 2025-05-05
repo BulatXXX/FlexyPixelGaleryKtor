@@ -35,8 +35,7 @@ class ResendEmailService(
             contentType(ContentType.Application.Json)
             setBody(request)
         }
-        println(r.headers)
-        println(r.status)
+        println("RESEND REQUEST STATUS ------->>>>>>> $r.status")
     }
 }
 

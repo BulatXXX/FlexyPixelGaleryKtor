@@ -18,8 +18,7 @@ import io.ktor.server.application.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation  // <-- клиентский плагин
-import io.ktor.serialization.kotlinx.json.json                     // <-- json() для клиента
-import io.ktor.server.application.*                                // <-- для Application
+import io.ktor.serialization.kotlinx.json.json                     // <-- json() для клиента // <-- для Application
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.core.qualifier.named
@@ -32,8 +31,8 @@ import users.repositories.UserRepository
 import users.repositories.UserRepositoryImpl
 import java.io.File
 
-const val apiUrl = "localhost"
-//const val apiUrl = "91.200.13.57"
+//const val apiUrl = "localhost"
+const val apiUrl = "91.200.13.57"
 
 fun Application.configureDi() {
     install(Koin) {
@@ -71,21 +70,23 @@ fun Application.configureDi() {
                     }
                 }
 
+                val apiKey = System.getenv("RESEND_API_KEY")
+                    ?: error("RESEND_API_KEY is not set in environment")
                 single<EmailService> {
                     ResendEmailService(
                         httpClient = get(),
-                        apiKey = "re_RkoSpe9K_Dt8sehXf7tanvdq3MpGLCzVt",
-                        fromEmail = "onboarding@resend.dev"
+                        apiKey = apiKey,
+                        fromEmail = "no-reply@flexypixel.com"
                     )
                 }
                 single { PasswordResetRepository() }
 
                 single<PasswordResetService> {
                     PasswordResetService(
-                        userRepository = get(),  // inject UserRepository
+                        userRepository = get(),
                         passwordResetRepository = get(),
                         emailService = get(),
-                        resetLinkBaseUrl = "http://185.103.109.185/",
+                        resetLinkBaseUrl = "http://185.103.109.185/password_reset",
                         tokenExpiryMinutes = 15L
                     )
                 }

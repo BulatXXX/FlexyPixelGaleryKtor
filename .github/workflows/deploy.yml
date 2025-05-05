@@ -35,4 +35,5 @@ jobs:
             cd /opt/flexypixel/FlexyPixelGaleryKtor
             git pull origin main
             docker compose pull backend
+            echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" > .env
             docker compose up -d --no-deps --build backend

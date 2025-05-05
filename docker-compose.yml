@@ -49,6 +49,7 @@ services:
       - JWT_AUDIENCE=jwt-audience
       - JWT_REALM=flexypixelapp
       - JWT_SECRET=flexypixel2025
+      - RESEND_API_KEY
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

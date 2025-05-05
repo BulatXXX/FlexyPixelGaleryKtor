@@ -8,9 +8,7 @@ import java.security.MessageDigest
 import users.repositories.UserRepository
 import java.time.LocalDateTime
 
-/**
- * Сервис для восстановления пароля
- */
+
 class PasswordResetService(
     private val userRepository: UserRepository,
     private val passwordResetRepository: PasswordResetRepository,
@@ -19,9 +17,6 @@ class PasswordResetService(
     private val tokenExpiryMinutes: Long = 15
 ) {
 
-    /**
-     * Шаг 1: запрос сброса пароля
-     */
     suspend fun requestReset(email: String) {
         val userId = userRepository.getUserId(email) ?: return
         val rawToken = UUID.randomUUID().toString()
@@ -38,9 +33,6 @@ class PasswordResetService(
         emailService.sendPasswordResetEmail(email, link)
     }
 
-    /**
-     * Шаг 2: подтверждение и смена пароля
-     */
     fun confirmReset(token: String, newPassword: String): Boolean {
         val tokenHash = hashToken(token)
         val resetToken = passwordResetRepository.findValidByHash(tokenHash) ?: return false
@@ -54,9 +46,6 @@ class PasswordResetService(
         return true
     }
 
-    /**
-     * Отдельный метод для SHA-256 хеширования токена
-     */
     private fun hashToken(token: String): String {
         val md = MessageDigest.getInstance("SHA-256")
         val digest = md.digest(token.toByteArray(Charsets.UTF_8))
