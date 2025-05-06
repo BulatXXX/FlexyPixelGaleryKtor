@@ -86,7 +86,7 @@ fun Application.configureDi() {
                         userRepository = get(),
                         passwordResetRepository = get(),
                         emailService = get(),
-                        resetLinkBaseUrl = "http://185.103.109.185/password_reset",
+                        resetLinkBaseUrl = "http://185.103.109.185/password-reset",
                         tokenExpiryMinutes = 15L
                     )
                 }
