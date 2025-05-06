@@ -65,11 +65,11 @@ fun Route.authRoutes() {
             val request = call.receive<Map<String, String>>()
             val refreshToken = request["refreshToken"]
             if (refreshToken == null) {
-                call.respond(HttpStatusCode.BadRequest, "Missing refreshToken")
+                call.respond(HttpStatusCode.Unauthorized, "Missing refreshToken")
                 return@post
             }
             val response = authService.refreshToken(refreshToken) ?: call.respond(
-                HttpStatusCode.BadRequest,
+                HttpStatusCode.Unauthorized,
                 "Invalid refresh token"
             )
             call.respond(HttpStatusCode.OK, response)
