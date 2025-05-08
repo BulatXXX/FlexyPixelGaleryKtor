@@ -134,7 +134,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
         return transaction {
             val configRow = LEDPanelsConfiguration.selectAll().where {
                 (LEDPanelsConfiguration.publicId eq publicId) and
-                        (LEDPanelsConfiguration.ownerId eq requesterId)
+                        ((LEDPanelsConfiguration.ownerId eq requesterId) or (LEDPanelsConfiguration.isPublic eq true))
             }
                 .singleOrNull() ?: return@transaction null
             val configId = configRow[LEDPanelsConfiguration.id]
