@@ -61,5 +61,6 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.4")
 
     implementation("at.favre.lib:bcrypt:0.9.0")
+    implementation("com.madgag:animated-gif-lib:1.4")
 
 }
