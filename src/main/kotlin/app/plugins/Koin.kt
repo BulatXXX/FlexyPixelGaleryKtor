@@ -32,7 +32,7 @@ import users.repositories.UserRepositoryImpl
 import java.io.File
 
 //const val apiUrl = "localhost"
-const val apiUrl = "91.200.13.57"
+const val apiUrl = "https://flexypixelapi.fun"
 
 fun Application.configureDi() {
     install(Koin) {
@@ -42,17 +42,17 @@ fun Application.configureDi() {
                 single<AuthRepository> { AuthRepositoryImpl() }
                 single { AuthService(get()) }
                 single { File("uploads/avatars") }
-                single(named("avatarBaseUrl")) { "http://${apiUrl}:8080/uploads/avatars" }
+                single(named("avatarBaseUrl")) { "${apiUrl}/uploads/avatars" }
                 single {
                     SvgPreviewGenerator(
                         outputDir = File("previews"),
-                        baseUrl = "http://${apiUrl}:8080/previews"
+                        baseUrl = "${apiUrl}/previews"
                     )
                 }
                 single {
                     PreviewGenerator(
                         outputDir = File("previews"),
-                        baseUrl = "http://${apiUrl}:8080/previews"
+                        baseUrl = "${apiUrl}/previews"
                     )
                 }
                 single { UserService(get(), get(named("avatarBaseUrl")), get()) }
@@ -86,7 +86,7 @@ fun Application.configureDi() {
                         userRepository = get(),
                         passwordResetRepository = get(),
                         emailService = get(),
-                        resetLinkBaseUrl = "http://185.103.109.185/password-reset",
+                        resetLinkBaseUrl = "https://flexypixel.fun/password-reset",
                         tokenExpiryMinutes = 15L
                     )
                 }
