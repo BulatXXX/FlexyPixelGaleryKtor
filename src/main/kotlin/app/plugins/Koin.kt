@@ -76,7 +76,7 @@ fun Application.configureDi() {
                     ResendEmailService(
                         httpClient = get(),
                         apiKey = apiKey,
-                        fromEmail = "onboarding@resend.dev"
+                        fromEmail = "no-reply@flexypixel.fun",
                     )
                 }
                 single { PasswordResetRepository() }
