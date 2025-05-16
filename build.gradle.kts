@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 val exposed_version: String by project
 val h2_version: String by project
 val kotlin_version: String by project
@@ -65,8 +68,9 @@ dependencies {
 
     testImplementation("com.typesafe:config:1.4.2")
     testImplementation("io.ktor:ktor-server-test-host:$3.1.1")
+
 }
 
-tasks.test {
+tasks.named<Test>("test") {
     environment("RESEND_API_KEY", System.getenv("RESEND_API_KEY") ?: "dummy-key")
 }
