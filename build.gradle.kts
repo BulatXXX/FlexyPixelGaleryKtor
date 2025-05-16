@@ -63,4 +63,11 @@ dependencies {
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("com.madgag:animated-gif-lib:1.4")
 
+    testImplementation("com.typesafe:config:1.4.2")
+    testImplementation("io.ktor:ktor-server-test-host:$3.1.1")
+}
+
+tasks.named<Test>("test") {
+
+    environment("RESEND_API_KEY", System.getenv("RESEND_API_KEY") ?: "dummy-key")
 }

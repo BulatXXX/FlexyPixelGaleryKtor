@@ -60,7 +60,6 @@ inline fun <T> ApplicationCall.optionalParam(
 }
 
 
-
 fun Application.configureRouting() {
     routing {
         get("/hello") {
@@ -87,7 +86,7 @@ fun Application.configureRouting() {
         staticFiles("/uploads", File("uploads"))
         staticFiles("/previews", File("previews"))
         authRoutes()
-        route("/configurations"){
+        route("/configurations") {
             usersConfigurationRoutes()
             galleryRoutes()
         }
