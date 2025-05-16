@@ -67,8 +67,6 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$3.1.1")
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-    systemProperty("config.resource", "application-test.conf")
+tasks.test {
     environment("RESEND_API_KEY", System.getenv("RESEND_API_KEY") ?: "dummy-key")
 }
