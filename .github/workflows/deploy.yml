@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Run backend integration tests
+      - name: Run backend tests
         run: ./gradlew test --no-daemon
 
 

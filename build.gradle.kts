@@ -68,6 +68,7 @@ dependencies {
 }
 
 tasks.named<Test>("test") {
-
+    useJUnitPlatform()
+    systemProperty("config.resource", "application-test.conf")
     environment("RESEND_API_KEY", System.getenv("RESEND_API_KEY") ?: "dummy-key")
 }
