@@ -80,10 +80,9 @@ class MobileConfigurationsService(
         else PostResult.Failure
     }
 
-    fun updateConfiguration(ownerId: Int, mobileConfiguration: MobileConfiguration): UpdateResult = transaction {
-        if (mobileConfiguration.publicId == null) return@transaction UpdateResult.NoConfigId
-        if (mobileConfigurationsRepository.isOwner(mobileConfiguration.publicId, ownerId)) {
-            val parsedConfig = mobileConfiguration.parseFromMobile()
+    fun updateConfiguration(ownerId: Int, mobileConfiguration: MobileConfiguration, configId: UUID): UpdateResult = transaction {
+        if (mobileConfigurationsRepository.isOwner(configId, ownerId)) {
+            val parsedConfig = mobileConfiguration.parseFromMobile(configId)
             val panels = parsedConfig.panelsInfo.map {
                 PanelData(
                     x = it.x,
@@ -100,12 +99,12 @@ class MobileConfigurationsService(
             val previewUrl = previewGenerator.generate(
                 panels = panels,
                 frame = frame,
-                configurationId = mobileConfiguration.publicId,
+                configurationId = configId,
             )
             val miniPreviewUrl = previewGenerator.generate(
                 panels = panels,
                 frame = frame,
-                configurationId = mobileConfiguration.publicId,
+                configurationId = configId,
                 miniPanelUID = mobileConfiguration.miniPreviewPanelUid
             )
             return@transaction if (mobileConfigurationsRepository.updateConfiguration(
@@ -116,7 +115,7 @@ class MobileConfigurationsService(
             ) UpdateResult.Success
             else UpdateResult.UpdateError
         } else {
-            if (mobileConfigurationsRepository.exists(mobileConfiguration.publicId)) {
+            if (mobileConfigurationsRepository.exists(configId)) {
                 return@transaction UpdateResult.Forbidden
             }
             return@transaction UpdateResult.NotFound

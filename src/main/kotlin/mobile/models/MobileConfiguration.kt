@@ -51,10 +51,13 @@ data class MobileConfiguration(
         return copy(frameInfo = newFrames, panelsInfo = newPanels)
     }
 
-    fun parseFromMobile(): MobileConfiguration {
+    fun parseFromMobile(configId:UUID? = null): MobileConfiguration {
         val newFrames = parseFramesFromMobile()
         val newPanels = denormalizeCoordinates()
-        return copy(frameInfo = newFrames, panelsInfo = newPanels)
+        return if (configId != null) {
+            copy(frameInfo = newFrames, panelsInfo = newPanels, publicId = configId)
+        }
+        else copy(frameInfo = newFrames, panelsInfo = newPanels)
     }
     private fun MobileConfiguration.denormalizeCoordinates(
         stepX: Int = 8,

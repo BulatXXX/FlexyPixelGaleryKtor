@@ -63,8 +63,9 @@ fun Route.mobileRoutes() {
             }
             patch("{publicId}") {
                 val ownerId = call.requireUserId() ?: return@patch
+                val configId = call.requireParam("publicId") { UUID.fromString(it) } ?: return@patch
                 val mobileConfiguration = call.receive<MobileConfiguration>()
-                val result = mobileConfigurationsService.updateConfiguration(ownerId, mobileConfiguration)
+                val result = mobileConfigurationsService.updateConfiguration(ownerId, mobileConfiguration,configId)
                 call.respondUpdate(result)
             }
 
