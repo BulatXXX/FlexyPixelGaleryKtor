@@ -24,7 +24,7 @@ suspend fun ApplicationCall.respondGet(getResult: GetResult) = when (getResult) 
 }
 
 suspend fun ApplicationCall.respondPost(postResult: PostResult) = when (postResult) {
-    is PostResult.Success -> respond(HttpStatusCode.Created, postResult.publicId)
+    is PostResult.Success -> respond(HttpStatusCode.Created, mapOf("publicId" to postResult.publicId))
     else -> respond(HttpStatusCode.InternalServerError, mapOf("error" to "Internal Server Error"))
 }
 
