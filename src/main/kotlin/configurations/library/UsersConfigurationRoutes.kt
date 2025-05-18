@@ -127,6 +127,7 @@ fun Route.usersConfigurationRoutes() {
                     configurationService.updateFrame(configurationPublicId, frameIndex, updatedFrame, requesterId)
                 call.respondUpdate(result)
             }
+
             get("{publicId}") {
                 val configurationPublicId =
                     call.getPublicIdFromParams() ?: return@get

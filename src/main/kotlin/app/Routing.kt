@@ -11,6 +11,7 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import mobile.mobileRoutes
 import org.koin.ktor.ext.inject
 import password_recovery.EmailService
 import password_recovery.passwordRecoveryRoutes
@@ -63,7 +64,7 @@ inline fun <T> ApplicationCall.optionalParam(
 fun Application.configureRouting() {
     routing {
         get("/hello") {
-            val version = "0.3.1"
+            val version = "0.4.0"
             val html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -92,5 +93,6 @@ fun Application.configureRouting() {
         }
         userRoutes()
         passwordRecoveryRoutes()
+        mobileRoutes()
     }
 }

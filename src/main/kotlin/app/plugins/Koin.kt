@@ -19,6 +19,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation  // <-- клиентский плагин
 import io.ktor.serialization.kotlinx.json.json                     // <-- json() для клиента // <-- для Application
+import mobile.MobileConfigurationsRepository
+import mobile.MobileConfigurationsService
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.core.qualifier.named
@@ -31,7 +33,7 @@ import users.repositories.UserRepository
 import users.repositories.UserRepositoryImpl
 import java.io.File
 
-//const val apiUrl = "localhost"
+//const val apiUrl = "localhost:8080"
 const val apiUrl = "https://flexypixelapi.fun"
 
 fun Application.configureDi() {
@@ -43,6 +45,7 @@ fun Application.configureDi() {
                 single { AuthService(get()) }
                 single { File("uploads/avatars") }
                 single(named("avatarBaseUrl")) { "${apiUrl}/uploads/avatars" }
+
                 single {
                     SvgPreviewGenerator(
                         outputDir = File("previews"),
@@ -72,6 +75,7 @@ fun Application.configureDi() {
 
                 val apiKey = System.getenv("RESEND_API_KEY")
                     ?: error("RESEND_API_KEY is not set in environment")
+
                 single<EmailService> {
                     ResendEmailService(
                         httpClient = get(),
@@ -90,6 +94,8 @@ fun Application.configureDi() {
                         tokenExpiryMinutes = 15L
                     )
                 }
+                single {MobileConfigurationsRepository()}
+                single { MobileConfigurationsService(get(),get()) }
             }
         )
     }

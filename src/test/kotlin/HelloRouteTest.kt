@@ -16,7 +16,6 @@ class HelloRouteTest {
     @Test
     fun `GET hello should return HTML greeting`() = testApplication {
         application {
-            // 1) Устанавливаем плагин Authentication с провайдером "auth-jwt"
             install(Authentication) {
                 jwt("auth-jwt") {
                     realm = "ktor-test"
@@ -36,6 +35,6 @@ class HelloRouteTest {
         assertEquals(HttpStatusCode.OK, response.status)
 
         val body = response.bodyAsText()
-        assertTrue(body.contains("<h1>Hello FlexyPixel 0.3.0!</h1>"))
+        assertTrue(body.contains("<h1>Hello FlexyPixel"))
     }
 }

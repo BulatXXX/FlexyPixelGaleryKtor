@@ -51,7 +51,6 @@ fun Route.userRoutes() {
                 patch("/avatar") {
                     val userId = call.requireUserId() ?: return@patch
 
-                    // 1. Принимаем файл
                     val multipart = call.receiveMultipart()
                     var fileName: String? = null
                     var fileBytes: ByteArray? = null
@@ -64,13 +63,12 @@ fun Route.userRoutes() {
                         part.dispose()
                     }
 
-                    // 2. Валидация базовая
+
                     if (fileName == null || fileBytes == null) {
                         call.respond(HttpStatusCode.BadRequest, mapOf("error" to "No file provided"))
                         return@patch
                     }
 
-                    // 3. Делегируем всю логику в сервис
                     val result = userService.replaceAvatar(userId, fileName!!, fileBytes!!)
                     result.fold(
                         onSuccess = { newUrl ->
