@@ -70,7 +70,7 @@ class SvgPreviewGenerator(
 
         if (!outputDir.exists()) outputDir.mkdirs()
         val fileSuffix = if (miniPanelUID != null) "-mini" else ""
-        val fileName = "preview-$configurationId$fileSuffix.svg"
+        val fileName = "preview-$configurationId${LocalDateTime.now()}$fileSuffix.svg"
         val outFile = File(outputDir, fileName)
         outFile.writeText(svg.toString())
 

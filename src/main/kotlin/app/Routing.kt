@@ -64,7 +64,7 @@ inline fun <T> ApplicationCall.optionalParam(
 fun Application.configureRouting() {
     routing {
         get("/hello") {
-            val version = "0.4.4"
+            val version = "0.4.5"
             val html = """
     <!DOCTYPE html>
     <html lang="en">
