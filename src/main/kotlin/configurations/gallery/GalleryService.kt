@@ -8,7 +8,7 @@ import configurations.gallery.models.search_request.SearchFilters
 import configurations.gallery.models.subscribe_request.SubscribeResult
 import configurations.gallery.repositories.GalleryRepository
 import configurations.gallery.repositories.SearchRepository
-import configurations.library.SvgPreviewGenerator
+import configurations.util.SvgPreviewGenerator
 import java.util.*
 
 

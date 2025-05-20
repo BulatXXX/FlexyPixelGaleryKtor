@@ -2,7 +2,7 @@ package mobile
 
 import configurations.common.models.FrameData
 import configurations.common.models.PanelData
-import configurations.library.SvgPreviewGenerator
+import configurations.util.SvgPreviewGenerator
 import mobile.models.ConfigData
 import mobile.models.MobileConfiguration
 import mobile.models.results.DeleteResult

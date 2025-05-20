@@ -1,9 +1,8 @@
 package configurations.newlibrary
 
-import configurations.library.SvgPreviewGenerator
+import configurations.util.SvgPreviewGenerator
 import configurations.library.models.create_request.CreateConfigurationData
 import configurations.library.models.create_request.CreateResult
-import configurations.library.models.update_request.UpdateConfigurationDataRequest
 import java.util.*
 
 class LibraryConfigurationService(

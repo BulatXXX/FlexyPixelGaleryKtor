@@ -9,7 +9,7 @@ import configurations.gallery.repositories.GalleryRepositoryImpl
 import configurations.gallery.repositories.SearchRepository
 import configurations.gallery.repositories.SearchRepositoryImpl
 import configurations.library.ConfigurationService
-import configurations.library.SvgPreviewGenerator
+import configurations.util.SvgPreviewGenerator
 import configurations.library.repositories.ConfigurationRepository
 import configurations.library.repositories.ConfigurationRepositoryImpl
 import configurations.util.PreviewGenerator

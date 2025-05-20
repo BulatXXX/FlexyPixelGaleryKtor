@@ -10,6 +10,7 @@ import users.repositories.UserRepository
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.time.LocalDateTime
 import java.util.*
 
 class UserService(private val userRepository: UserRepository,
@@ -48,7 +49,7 @@ class UserService(private val userRepository: UserRepository,
 
         // 3) Сохраняем новый файл
         uploadDir.mkdirs()
-        val newFileName = "$userId.$ext"
+        val newFileName = "$userId${LocalDateTime.now()}.$ext"
         val target = File(uploadDir, newFileName)
         try {
             target.writeBytes(bytes)

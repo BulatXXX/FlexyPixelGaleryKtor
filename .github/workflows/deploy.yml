@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
 
       - name: Run backend tests
-        run: ./gradlew test --no-daemon --info --stacktrace
+        run: ./gradlew test --no-daemon
 
 
   build-and-deploy:

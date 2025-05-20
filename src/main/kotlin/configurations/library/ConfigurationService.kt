@@ -10,6 +10,7 @@ import configurations.library.models.update_request.UpdateConfigurationDataReque
 import configurations.library.models.update_request.UpdateConfigurationStructureRequest
 import configurations.library.models.update_request.UpdateResult
 import configurations.library.repositories.ConfigurationRepository
+import configurations.util.SvgPreviewGenerator
 import java.io.File
 import java.util.UUID
 
