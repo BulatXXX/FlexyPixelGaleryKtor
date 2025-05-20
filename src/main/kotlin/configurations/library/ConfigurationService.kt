@@ -127,17 +127,18 @@ class ConfigurationService(
             UpdateResult.NotFound
     }
 
-    fun deleteConfiguration(publicId: UUID, requesterId: Int): DeleteResult = when {
-        configurationRepository.deleteConfiguration(publicId, requesterId).also {
-            deleteOldPreviews(publicId)
-        } ->
-            DeleteResult.Success("Deleted configuration")
+    fun deleteConfiguration(publicId: UUID, requesterId: Int): DeleteResult {
+        deleteOldPreviews(publicId)
+        return when {
+            configurationRepository.deleteConfiguration(publicId, requesterId) ->
+                DeleteResult.Success("Deleted configuration")
 
-        configurationRepository.exists(publicId) ->
-            DeleteResult.Forbidden
+            configurationRepository.exists(publicId) ->
+                DeleteResult.Forbidden
 
-        else ->
-            DeleteResult.NotFound
+            else ->
+                DeleteResult.NotFound
+        }
     }
 
     private fun deleteOldPreviews(publicId: UUID) {
