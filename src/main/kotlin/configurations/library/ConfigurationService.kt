@@ -82,13 +82,7 @@ class ConfigurationService(
             val panels = request.panels
             val firstFrame = request.frames.firstOrNull()
             firstFrame?.let {
-                val oldMeta = configurationRepository.getConfigInfo(publicId)
-
-                oldMeta?.previewImageUrl?.let {
-                    deletePreviewFile(it)
-                }
-                oldMeta?.miniPreviewImageUrl?.let {
-                    deletePreviewFile(it) }
+                deleteOldPreviews(publicId)
 
                 val previewUrl =
                     previewGenerator.generate(configurationId = publicId, panels = panels, frame = firstFrame)
@@ -134,7 +128,9 @@ class ConfigurationService(
     }
 
     fun deleteConfiguration(publicId: UUID, requesterId: Int): DeleteResult = when {
-        configurationRepository.deleteConfiguration(publicId, requesterId) ->
+        configurationRepository.deleteConfiguration(publicId, requesterId).also {
+            deleteOldPreviews(publicId)
+        } ->
             DeleteResult.Success("Deleted configuration")
 
         configurationRepository.exists(publicId) ->
@@ -142,6 +138,17 @@ class ConfigurationService(
 
         else ->
             DeleteResult.NotFound
+    }
+
+    private fun deleteOldPreviews(publicId: UUID) {
+        val oldMeta = configurationRepository.getConfigInfo(publicId)
+
+        oldMeta?.previewImageUrl?.let {
+            deletePreviewFile(it)
+        }
+        oldMeta?.miniPreviewImageUrl?.let {
+            deletePreviewFile(it)
+        }
     }
 
     fun getFullConfiguration(publicId: UUID, requesterId: Int): GetResult {
