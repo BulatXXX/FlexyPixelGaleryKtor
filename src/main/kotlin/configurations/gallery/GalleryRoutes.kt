@@ -15,6 +15,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.json.*
 import org.koin.ktor.ext.inject
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.*
 
 
@@ -101,10 +102,17 @@ object SearchFiltersMapper {
             ?.takeIf { it is JsonObject }
             ?.jsonObject
             ?.let { range ->
-                RangeFilter(
-                    from = range["from"]?.jsonPrimitive?.contentOrNull?.let { LocalDateTime.parse(it) },
-                    to = range["to"]?.jsonPrimitive?.contentOrNull?.let { LocalDateTime.parse(it) }
-                ).also { println("publishedAtRange = $it") }
+                val from = range["from"]
+                    ?.jsonPrimitive
+                    ?.contentOrNull
+                    ?.let { OffsetDateTime.parse(it).toLocalDateTime() }
+
+                val to = range["to"]
+                    ?.jsonPrimitive
+                    ?.contentOrNull
+                    ?.let { OffsetDateTime.parse(it).toLocalDateTime() }
+
+                RangeFilter(from = from, to = to)
             }
 
         val ratingRange = body["ratingRange"]
