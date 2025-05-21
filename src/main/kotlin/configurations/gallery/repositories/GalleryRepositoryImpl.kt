@@ -7,6 +7,7 @@ import configurations.common.models.PanelData
 import configurations.gallery.models.PreviewUrls
 import configurations.gallery.models.publish_request.PublishRequest
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 import java.util.*
@@ -53,6 +54,9 @@ class GalleryRepositoryImpl : GalleryRepository {
 
         LEDPanelsConfigurationMetadata.insert {
             it[configurationId] = newId
+            it[publishedAt]=LocalDateTime.now()
+            it[averageRating]= 5.0
+            it[addedCount]=0
         }
 
         request.tagIds.forEach { tagId ->
@@ -96,7 +100,11 @@ class GalleryRepositoryImpl : GalleryRepository {
                         (LEDPanelsConfiguration.isPublic eq true)
             }.singleOrNull() ?: return@transaction false
 
+
             val origId = origRow[LEDPanelsConfiguration.id]
+            LEDPanelsConfigurationMetadata.update ({LEDPanelsConfigurationMetadata.configurationId eq origId}){
+                it[addedCount] = addedCount+1
+            }
             val newId = insertSubscribedConfiguration(newConfigId, requesterId, origRow) ?: return@transaction false
 
             insertDuplicatedPanels(origId, newId)
