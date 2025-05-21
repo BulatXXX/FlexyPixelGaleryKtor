@@ -83,6 +83,7 @@ class SvgPreviewGenerator(
         fun copyOne(suffix: String): String {
             val originalName = if(suffix=="-mini") previewUrls.miniPreviewUrl else previewUrls.previewUrl
             val newName = "preview-$newConfigId${LocalDateTime.now()}$suffix.svg"
+            println("${previewUrls.previewUrl}    ${previewUrls.miniPreviewUrl}")
             val origFile = File(outputDir, originalName)
             if (origFile.exists()) {
                 val target = File(outputDir, newName)
