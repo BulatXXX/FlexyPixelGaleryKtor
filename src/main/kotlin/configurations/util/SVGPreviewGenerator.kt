@@ -81,21 +81,16 @@ class SvgPreviewGenerator(
     //DoesntWorkLikeBefore
     fun duplicate(previewUrls: PreviewUrls, newConfigId: UUID): Pair<String, String> {
         fun copyOne(suffix: String): String {
-            println(suffix)
-            val originalName = if(suffix=="-mini") previewUrls.miniPreviewUrl else previewUrls.previewUrl
-            println(originalName)
+            val fullUrl = if(suffix=="-mini") previewUrls.miniPreviewUrl else previewUrls.previewUrl
+            val originalName = fullUrl.substringAfterLast('/')
             val newName = "preview-$newConfigId${LocalDateTime.now()}$suffix.svg"
             val origFile = File(outputDir, originalName)
-            println(newName)
             if (origFile.exists()) {
                 val target = File(outputDir, newName)
                 origFile.copyTo(target, overwrite = true)
-                println("good")
             }
             return "$baseUrl/$newName"
         }
-        println()
-        println("${previewUrls.previewUrl}    ${previewUrls.miniPreviewUrl}")
         val fullUrl = copyOne("")
         val miniUrl = copyOne("-mini")
         return fullUrl to miniUrl
