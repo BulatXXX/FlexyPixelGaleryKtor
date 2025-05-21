@@ -1,6 +1,7 @@
 package configurations.gallery.repositories
 
 
+import configurations.gallery.models.PreviewUrls
 import configurations.gallery.models.publish_request.ConfigurationInfo
 import configurations.gallery.models.publish_request.PublishRequest
 import java.util.*
@@ -23,4 +24,6 @@ interface GalleryRepository {
         fullPreviewUrl: String,
         miniPreviewUrl: String
     ): Boolean
+
+    fun getPreviewUrl(publicConfigID: UUID): PreviewUrls?
 }

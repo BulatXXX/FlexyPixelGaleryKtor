@@ -2,6 +2,7 @@ package configurations.util
 
 import configurations.common.models.FrameData
 import configurations.common.models.PanelData
+import configurations.gallery.models.PreviewUrls
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.LocalDateTime
@@ -77,10 +78,11 @@ class SvgPreviewGenerator(
         return "$baseUrl/$fileName"
     }
 
-    fun duplicate(configId: UUID, newConfigId: UUID): Pair<String, String> {
+    //DoesntWorkLikeBefore
+    fun duplicate(previewUrls: PreviewUrls, newConfigId: UUID): Pair<String, String> {
         fun copyOne(suffix: String): String {
-            val originalName = "preview-$configId$suffix${LocalDateTime.now()}.svg"
-            val newName = "preview-$newConfigId$suffix${LocalDateTime.now()}.svg"
+            val originalName = if(suffix=="-mini") previewUrls.miniPreviewUrl else previewUrls.previewUrl
+            val newName = "preview-$newConfigId${LocalDateTime.now()}$suffix.svg"
             val origFile = File(outputDir, originalName)
             if (origFile.exists()) {
                 val target = File(outputDir, newName)

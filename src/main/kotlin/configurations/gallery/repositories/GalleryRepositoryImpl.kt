@@ -4,6 +4,7 @@ import app.entities.*
 import configurations.gallery.models.publish_request.ConfigurationInfo
 import configurations.common.models.FrameData
 import configurations.common.models.PanelData
+import configurations.gallery.models.PreviewUrls
 import configurations.gallery.models.publish_request.PublishRequest
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -30,6 +31,7 @@ class GalleryRepositoryImpl : GalleryRepository {
             LEDPanelsConfiguration.publicId eq publicConfigId
         }.count() > 0
     }
+
 
     override fun publish(
         oldConfigID: UUID,
@@ -75,20 +77,33 @@ class GalleryRepositoryImpl : GalleryRepository {
         } > 0
     }
 
-    override fun subscribeConfiguration(sourcePublicConfigID: UUID, newConfigId: UUID, requesterId: Int): Boolean = transaction {
-        val origRow = LEDPanelsConfiguration.selectAll().where {
-            (LEDPanelsConfiguration.publicId eq sourcePublicConfigID) and
-                    (LEDPanelsConfiguration.isPublic eq true)
-        }.singleOrNull() ?: return@transaction false
-
-        val origId = origRow[LEDPanelsConfiguration.id]
-        val newId = insertSubscribedConfiguration(newConfigId, requesterId, origRow) ?: return@transaction false
-
-        insertDuplicatedPanels(origId, newId)
-        insertDuplicatedFrames(origId, newId)
-
-        return@transaction true
+    override fun getPreviewUrl(publicConfigID: UUID): PreviewUrls? = transaction {
+        val res = LEDPanelsConfiguration.selectAll().where {
+            LEDPanelsConfiguration.publicId eq publicConfigID
+        }.singleOrNull() ?: return@transaction null
+        val previewUrl = res[LEDPanelsConfiguration.previewImageUrl] ?: return@transaction null
+        val miniPreviewUrl = res[LEDPanelsConfiguration.miniPreviewImageUrl] ?: return@transaction null
+        return@transaction PreviewUrls(
+            previewUrl = previewUrl,
+            miniPreviewUrl = miniPreviewUrl
+        )
     }
+
+    override fun subscribeConfiguration(sourcePublicConfigID: UUID, newConfigId: UUID, requesterId: Int): Boolean =
+        transaction {
+            val origRow = LEDPanelsConfiguration.selectAll().where {
+                (LEDPanelsConfiguration.publicId eq sourcePublicConfigID) and
+                        (LEDPanelsConfiguration.isPublic eq true)
+            }.singleOrNull() ?: return@transaction false
+
+            val origId = origRow[LEDPanelsConfiguration.id]
+            val newId = insertSubscribedConfiguration(newConfigId, requesterId, origRow) ?: return@transaction false
+
+            insertDuplicatedPanels(origId, newId)
+            insertDuplicatedFrames(origId, newId)
+
+            return@transaction true
+        }
 
     private fun insertSubscribedConfiguration(
         newConfigId: UUID,

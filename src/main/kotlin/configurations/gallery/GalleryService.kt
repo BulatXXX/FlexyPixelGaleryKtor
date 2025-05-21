@@ -23,14 +23,19 @@ class GalleryService(
             else PublishResult.NotFound
         if (configurationData.isPublic) return PublishResult.AlreadyPublished
         val newPublicId = UUID.randomUUID()
-        val (newFullUrl, newMiniUrl) = previewGenerator.duplicate(configId, newPublicId)
+        val previewUrls = galleryRepository.getPreviewUrl(configId)
+
+        val (newFullUrl, newMiniUrl) = if (previewUrls != null) {
+            previewGenerator.duplicate(previewUrls, newPublicId)
+        }else{
+            "" to "" //TODO generateNew
+        }
         return if (galleryRepository.publish(configId, newPublicId, request) && galleryRepository.updatePreviewUrls(
                 publicId = newPublicId,
                 fullPreviewUrl = newFullUrl,
                 miniPreviewUrl = newMiniUrl
             )
         )
-
             PublishResult.Success(
                 PublishResponse(
                     newPublicId
@@ -42,7 +47,12 @@ class GalleryService(
 
     fun subscribeConfiguration(requesterId: Int, configId: UUID): SubscribeResult {
         val newPublicId = UUID.randomUUID()
-        val (newFullUrl, newMiniUrl) = previewGenerator.duplicate(configId, newPublicId)
+        val previewUrls = galleryRepository.getPreviewUrl(configId)
+        val (newFullUrl, newMiniUrl) = if (previewUrls != null) {
+            previewGenerator.duplicate(previewUrls, newPublicId)
+        }else{
+            "" to "" //TODO generateNew
+        }
         return if (galleryRepository.subscribeConfiguration(
                 configId,
                 newPublicId,

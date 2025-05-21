@@ -7,6 +7,7 @@ import java.util.*
 object JwtClaims {
     const val PUBLIC_ID = "publicId"
     const val USER_ID = "userId"
+    const val USER_ROLE = "userRole"
 }
 
 object JwtConfig {
