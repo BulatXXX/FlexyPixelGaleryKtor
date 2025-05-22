@@ -50,7 +50,8 @@ class AuthRepositoryImpl : AuthRepository {
                 LoginCredentials(
                     id = it[User.id],
                     publicId = it[User.publicId],
-                    passwordHash = it[User.passwordHash]
+                    passwordHash = it[User.passwordHash],
+                    role = it[User.role],
                 )
             }.singleOrNull()
         }

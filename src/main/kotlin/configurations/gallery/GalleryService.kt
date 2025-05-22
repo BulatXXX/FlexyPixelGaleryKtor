@@ -1,5 +1,7 @@
 package configurations.gallery
 
+import app.entities.UserRole
+import configurations.gallery.models.BanResult
 import configurations.gallery.models.publish_request.PublishRequest
 import configurations.gallery.models.publish_request.PublishResponse
 import configurations.gallery.models.publish_request.PublishResult
@@ -27,7 +29,7 @@ class GalleryService(
 
         val (newFullUrl, newMiniUrl) = if (previewUrls != null) {
             previewGenerator.duplicate(previewUrls, newPublicId)
-        }else{
+        } else {
             "" to "" //TODO generateNew
         }
         return if (galleryRepository.publish(configId, newPublicId, request) && galleryRepository.updatePreviewUrls(
@@ -45,12 +47,21 @@ class GalleryService(
         }
     }
 
+    fun banConfiguration(userRole: UserRole, publicId: UUID) = when {
+        userRole == UserRole.USER -> BanResult.Forbidden
+        userRole == UserRole.ADMIN -> {
+            if (galleryRepository.banConfiguration(publicId)) BanResult.Success
+            else BanResult.Failure
+        }
+        else -> BanResult.Failure
+    }
+
     fun subscribeConfiguration(requesterId: Int, configId: UUID): SubscribeResult {
         val newPublicId = UUID.randomUUID()
         val previewUrls = galleryRepository.getPreviewUrl(configId)
         val (newFullUrl, newMiniUrl) = if (previewUrls != null) {
             previewGenerator.duplicate(previewUrls, newPublicId)
-        }else{
+        } else {
             "" to "" //TODO generateNew
         }
         return if (galleryRepository.subscribeConfiguration(

@@ -26,4 +26,5 @@ interface GalleryRepository {
     ): Boolean
 
     fun getPreviewUrl(publicConfigID: UUID): PreviewUrls?
+    fun banConfiguration(publicId: UUID): Boolean
 }

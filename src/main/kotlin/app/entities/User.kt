@@ -3,8 +3,8 @@ package app.entities
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime
 
-enum class UserRole { USER, ADMIN }
-enum class MobileRole {USER, DEVELOPER}
+enum class UserRole { USER, ADMIN}
+enum class MobileRole { USER, DEVELOPER }
 
 object User : Table("users") {
     val id = integer("id").autoIncrement()

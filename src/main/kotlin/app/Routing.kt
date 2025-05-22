@@ -1,6 +1,7 @@
 package app
 
 import app.config.JwtClaims
+import app.entities.UserRole
 import auth.authRoutes
 import configurations.gallery.galleryRoutes
 import configurations.library.usersConfigurationRoutes
@@ -12,8 +13,6 @@ import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import mobile.mobileRoutes
-import org.koin.ktor.ext.inject
-import password_recovery.EmailService
 import password_recovery.passwordRecoveryRoutes
 import users.userRoutes
 import java.io.File
@@ -25,6 +24,15 @@ suspend fun ApplicationCall.requireUserId(): Int? {
         return null
     }
     return principal.payload.getClaim(JwtClaims.USER_ID).asInt()
+}
+
+suspend fun ApplicationCall.requireUserRole(): UserRole? {
+    val principal = this.principal<JWTPrincipal>()
+    if (principal == null) {
+        respond(HttpStatusCode.Unauthorized)
+        return null
+    }
+    return UserRole.valueOf(principal.payload.getClaim(JwtClaims.USER_ROLE).asString())
 }
 
 suspend inline fun <T> ApplicationCall.requireParam(
@@ -64,7 +72,7 @@ inline fun <T> ApplicationCall.optionalParam(
 fun Application.configureRouting() {
     routing {
         get("/hello") {
-            val version = "0.4.6"
+            val version = "0.5.0"
             val html = """
     <!DOCTYPE html>
     <html lang="en">

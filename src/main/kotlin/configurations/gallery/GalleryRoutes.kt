@@ -2,6 +2,8 @@ package configurations.gallery
 
 import app.requireParam
 import app.requireUserId
+import app.requireUserRole
+import configurations.gallery.models.BanResult
 import configurations.gallery.models.publish_request.PublishRequest
 import configurations.gallery.models.publish_request.PublishResult
 import configurations.gallery.models.search_request.*
@@ -14,7 +16,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.*
 import org.koin.ktor.ext.inject
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -69,12 +70,25 @@ fun Route.galleryRoutes() {
                 call.respondSubscribe(result)
             }
 
+            patch("/{publicId}/ban") {
+                val configId = call.requireParam("publicId") { UUID.fromString(it) } ?: return@patch
+                val userRole = call.requireUserRole() ?: return@patch
+                val result = galleryService.banConfiguration(publicId = configId, userRole = userRole)
+                when(result){
+                    BanResult.Success -> call.respond(HttpStatusCode.OK, mapOf("message" to "Ban is successful"))
+                    BanResult.Forbidden -> call.respond(HttpStatusCode.Forbidden, mapOf("error" to "You have no rights! N-word"))
+                    BanResult.Failure -> call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Ban is failure"))
+                }
+            }
+
             post("/search") {
                 val filters = SearchFiltersMapper.parse(call)
                 val result = galleryService.searchGallery(filters)
                 println(mapOf("size" to result.size))// Передаём в сервис
                 call.respond(result)
             }
+
+
         }
     }
 }

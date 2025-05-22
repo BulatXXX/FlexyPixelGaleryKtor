@@ -1,5 +1,6 @@
 package app.config
 
+import app.entities.UserRole
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import java.util.*
@@ -24,20 +25,23 @@ object JwtConfig {
         algorithm = Algorithm.HMAC256(secret)
     }
 
-    fun generateAccessToken(userId: Int, publicId: UUID): String {
+    fun generateAccessToken(userId: Int, publicId: UUID,userRole: UserRole): String {
+        println(userRole)
         return JWT.create()
             .withIssuer(issuer)
             .withClaim(JwtClaims.PUBLIC_ID, publicId.toString())
             .withClaim(JwtClaims.USER_ID, userId)
+            .withClaim(JwtClaims.USER_ROLE, userRole.toString())
             .withExpiresAt(Date(System.currentTimeMillis() + accessValidityInMs))
             .sign(algorithm)
     }
 
-    fun generateRefreshToken(userId: Int,publicId: UUID): String {
+    fun generateRefreshToken(userId: Int,publicId: UUID,userRole: UserRole): String {
         return JWT.create()
             .withIssuer(issuer)
             .withClaim(JwtClaims.PUBLIC_ID, publicId.toString())
             .withClaim(JwtClaims.USER_ID, userId)
+            .withClaim(JwtClaims.USER_ROLE, userRole.toString())
             .withExpiresAt(Date(System.currentTimeMillis() + refreshValidityInMs))
             .sign(algorithm)
     }

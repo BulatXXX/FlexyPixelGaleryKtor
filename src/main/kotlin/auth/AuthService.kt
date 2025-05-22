@@ -3,6 +3,7 @@ package auth
 import at.favre.lib.crypto.bcrypt.BCrypt
 import app.config.JwtClaims
 import app.config.JwtConfig
+import app.entities.UserRole
 import auth.models.login_request.LoginRequest
 import auth.models.login_request.LoginResponse
 import auth.models.login_request.LoginResult
@@ -38,8 +39,8 @@ class AuthService(private val authRepository: AuthRepository) {
 
         if (!isPasswordCorrect) return LoginResult.IncorrectPassword
 
-        val token = JwtConfig.generateAccessToken(user.id, user.publicId)
-        val refreshToken = JwtConfig.generateRefreshToken(user.id, user.publicId)
+        val token = JwtConfig.generateAccessToken(user.id, user.publicId, user.role)
+        val refreshToken = JwtConfig.generateRefreshToken(user.id, user.publicId,user.role)
 
         val result = LoginResponse(
             accessToken = token,
@@ -55,11 +56,13 @@ class AuthService(private val authRepository: AuthRepository) {
             val decodedJWT = JwtConfig.getVerifier().verify(refreshToken)
             val publicIdStr = decodedJWT.getClaim(JwtClaims.PUBLIC_ID).asString()
             val userId = decodedJWT.getClaim(JwtClaims.USER_ID).asInt()
+            val stringRole = decodedJWT.getClaim(JwtClaims.USER_ROLE).asString()
+            val userRole = UserRole.valueOf(stringRole)
             if (publicIdStr.isNullOrBlank()) null
             else {
                 val publicId = UUID.fromString(publicIdStr)
-                val newAccessToken = JwtConfig.generateAccessToken(userId, publicId)
-                val newRefreshToken = JwtConfig.generateRefreshToken(userId, publicId)
+                val newAccessToken = JwtConfig.generateAccessToken(userId, publicId, userRole)
+                val newRefreshToken = JwtConfig.generateRefreshToken(userId, publicId,userRole)
                 RefreshResponse(newAccessToken, newRefreshToken)
             }
         } catch (ex: Exception) {

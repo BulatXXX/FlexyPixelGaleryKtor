@@ -18,7 +18,7 @@ class SearchRepositoryImpl : SearchRepository {
                 { LEDPanelsConfigurationMetadata.configurationId })
             .leftJoin(ConfigurationTags, { LEDPanelsConfiguration.id }, { ConfigurationTags.configurationId })
             .leftJoin(Tags, { ConfigurationTags.tagId }, { Tags.id })
-            .selectAll().where { LEDPanelsConfiguration.isPublic eq true }
+            .selectAll().where { (LEDPanelsConfiguration.isPublic eq true) and (LEDPanelsConfiguration.isBanned eq false)}
             .withDistinct()
 
         if (!filters.searchQuery.isNullOrBlank()) {

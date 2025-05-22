@@ -54,9 +54,9 @@ class GalleryRepositoryImpl : GalleryRepository {
 
         LEDPanelsConfigurationMetadata.insert {
             it[configurationId] = newId
-            it[publishedAt]=LocalDateTime.now()
-            it[averageRating]= 5.0
-            it[addedCount]=0
+            it[publishedAt] = LocalDateTime.now()
+            it[averageRating] = 5.0
+            it[addedCount] = 0
         }
 
         request.tagIds.forEach { tagId ->
@@ -102,8 +102,8 @@ class GalleryRepositoryImpl : GalleryRepository {
 
 
             val origId = origRow[LEDPanelsConfiguration.id]
-            LEDPanelsConfigurationMetadata.update ({LEDPanelsConfigurationMetadata.configurationId eq origId}){
-                it[addedCount] = addedCount+1
+            LEDPanelsConfigurationMetadata.update({ LEDPanelsConfigurationMetadata.configurationId eq origId }) {
+                it[addedCount] = addedCount + 1
             }
             val newId = insertSubscribedConfiguration(newConfigId, requesterId, origRow) ?: return@transaction false
 
@@ -165,6 +165,12 @@ class GalleryRepositoryImpl : GalleryRepository {
             this[Panel.direction] = row[Panel.direction]
 
         }
+    }
+
+    override fun banConfiguration(publicId: UUID): Boolean = transaction {
+        LEDPanelsConfiguration.update({ LEDPanelsConfiguration.publicId eq publicId }) {
+            it[LEDPanelsConfiguration.isBanned] = true
+        } > 0
     }
 
 
