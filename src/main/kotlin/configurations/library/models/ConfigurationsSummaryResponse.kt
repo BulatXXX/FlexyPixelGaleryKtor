@@ -24,6 +24,7 @@ data class ConfigurationSummaryResponse(
     val useMiniPreview: Boolean = true,
     @Contextual val createdAt: LocalDateTime,
     @Contextual val updatedAt: LocalDateTime,
+    val isPublic: Boolean,
     val forkStatus: ForkStatus,
     val forkInfo: ForkInfo? = null
 )

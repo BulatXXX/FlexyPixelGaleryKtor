@@ -246,7 +246,8 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
                         createdAt = configRow[LEDPanelsConfiguration.createdAt],
                         updatedAt = configRow[LEDPanelsConfiguration.updatedAt],
                         forkStatus = forkStatusRow,
-                        forkInfo = forkInfo
+                        forkInfo = forkInfo,
+                        isPublic = configRow[LEDPanelsConfiguration.isPublic],
                     )
                 }
         }
