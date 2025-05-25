@@ -84,6 +84,13 @@ class UserRepositoryImpl : UserRepository {
             ?.get(User.avatarUrl)
     }
 
+    override fun getAvatarUrl(loginOrEmail: String): String? = transaction {
+        val user = User.selectAll().where{
+            (User.login eq loginOrEmail) or (User.email eq loginOrEmail)
+        }.singleOrNull() ?: return@transaction null
+        return@transaction user[User.avatarUrl]
+    }
+
     override fun updateAvatarUrl(userId: Int, avatarUrl: String): Boolean = transaction {
         User.update({ User.id eq userId }) {
             it[User.avatarUrl] = avatarUrl

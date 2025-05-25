@@ -65,4 +65,7 @@ class UserService(private val userRepository: UserRepository,
         }
         return Result.success(publicUrl)
     }
+
+    fun getAvatarById(loginOrEmail: String): String? = userRepository.getAvatarUrl(loginOrEmail)
+
 }

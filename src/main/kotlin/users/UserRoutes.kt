@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import io.ktor.server.response.*
+import users.models.GetAvatarRequest
 import users.models.get_request.GetResult
 import users.models.update_request.UpdateRequest
 import users.models.update_request.UpdateResult
@@ -35,7 +36,6 @@ fun Route.userRoutes() {
     val userService: UserService by inject<UserService>()
     authenticate("auth-jwt") {
         route("/users") {
-
             route("/me") {
                 get {
                     val userId = call.requireUserId() ?: return@get
@@ -96,5 +96,22 @@ fun Route.userRoutes() {
 
 
         }
+
+    }
+    route("/users"){
+      get("/avatar"){
+          val request = call.receive<GetAvatarRequest>()
+          if (request.loginOrEmail.isBlank() || request.loginOrEmail.isEmpty() ) {
+              call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid login or email"))
+          }
+          val avatarUrl = userService.getAvatarById(request.loginOrEmail)
+          if(avatarUrl.isNullOrEmpty()){
+              call.respond(HttpStatusCode.BadRequest, mapOf("error" to "No avatar provided"))
+          }
+          else{
+              call.respond(mapOf("avatarUrl" to avatarUrl))
+          }
+
+      }
     }
 }
