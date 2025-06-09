@@ -35,7 +35,7 @@ object LEDPanelsConfiguration : Table(name = "configurations") {
             .references(id, onDelete = ReferenceOption.SET_NULL).nullable()
 
     val forkStatus = enumerationByName("fork_status", 10, ForkStatus::class).default(ForkStatus.ORIGINAL)
-    val interFrameDelay = integer("inter_frame_delay").default(1000)
+    val interFrameDelay = integer("inter_frame_delay").default(100)
     val createdAt = datetime("created_at")
     val updatedAt = datetime("updated_at")
     val isDeleted = bool("is_deleted").default(false)
