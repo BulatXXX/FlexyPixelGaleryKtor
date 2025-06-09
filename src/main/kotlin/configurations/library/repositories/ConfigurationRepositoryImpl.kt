@@ -52,6 +52,7 @@ class ConfigurationRepositoryImpl : ConfigurationRepository {
             it[this.ownerId] = ownerId
             it[this.name] = requestData.name
             it[this.description] = requestData.description
+            it[this.interframeDelay] = 50
             it[this.createdAt] = LocalDateTime.now()
             it[this.updatedAt] = LocalDateTime.now()
         }.resultedValues?.first()?.get(LEDPanelsConfiguration.id)
